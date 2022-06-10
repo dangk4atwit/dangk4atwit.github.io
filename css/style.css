@@ -31,8 +31,9 @@ img[name="logo"]{
     z-index: 900;
 }
 img[name="background"]{
-    width: 100%;
+    width: 100vw;
     height: 95vh;
+    object-fit: cover;
 }
 
 
