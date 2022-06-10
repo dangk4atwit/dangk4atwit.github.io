@@ -46,25 +46,25 @@ img[name="background"]{
         overflow: hidden;  
         padding: 60px;
         margin-bottom: 10vh;
-        padding-bottom: -10px;
+        padding-bottom: 70px;
         background: var(--vanta_black);
         border-style: solid;
         border-color: var(--orange);
         border-width: 1px;
         border-radius: 20px;  
         text-align: center;
-          
 }  
+
 h3{  
     text-align: center;  
     color: var(--orange); 
     margin-top: -30px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
     font-size: 40px;
 } 
 label{  
     color: var(--white);  
-    font-size: 17px;  
+    font-size: 17px;
 }  
 
 #Uname{  
@@ -77,6 +77,7 @@ label{
     border-color: var(--white);
     border-style: groove;
     border-width: 2px;
+    margin-top: 10px;
 }  
 #Pass{  
     width: 300px;  
@@ -88,6 +89,7 @@ label{
     border-color: var(--white);
     border-style: groove;
     border-width: 2px;
+    margin-top: 10px;
       
 }  
 .button[name="log"] {
