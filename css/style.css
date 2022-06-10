@@ -1,64 +1,133 @@
-    body  
-    {  
-        margin: 0;  
-        padding: 0;  
-        background-color:#6abadeba;  
-        font-family: 'Arial';  
-    }  
-    .login{  
-            width: 382px;  
-            overflow: hidden;  
-            margin: auto;  
-            margin: 20 0 0 450px;  
-            padding: 80px;  
-            background: #23463f;  
-            border-radius: 15px ;  
-              
-    }  
-    h2{  
-        text-align: center;  
-        color: #277582;  
-        padding: 20px;  
-    }  
-    h3{  
-        text-align: center;  
-        color: #277582;  
-        padding: 20px;  
-    } 
-    label{  
-        color: #08ffd1;  
-        font-size: 17px;  
-    }  
-    #Uname{  
-        width: 300px;  
-        height: 30px;  
-        border: none;  
-        border-radius: 3px;  
-        padding-left: 8px;  
-    }  
-    #Pass{  
-        width: 300px;  
-        height: 30px;  
-        border: none;  
-        border-radius: 3px;  
-        padding-left: 8px;  
+:root {
+    --orange: #ffa31a;
+    --middle_orange: #f5b24d;
+    --light_orange: #fac16c;
+    --dark_orange: #c47e16;
+    --light_grey: #808080;
+    --almost_black: #292929;
+    --black: #1b1b1b;
+    --vanta_black: #000000;
+    --white: #ffffff;
+}
+body  
+{  
+    margin: 0;  
+    padding: 0;  
+    background-color: var(--black);  
+    font-family: 'Arial';  
+    text-align: center;
+}  
+.logo{
+    margin: 0px;
+}
+img[name="logo"]{
+    max-width: 10vw;
+    max-height: 20vh;
+    position: absolute;
+    Top: 10px;
+    left: 10px;
+    float: left;
+}
+img[name="background"]{
+    width: auto;
+    height: 100vh;
+}
+
+.login{ 
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        width: 367px; 
+        height: 33vh; 
+        overflow: hidden;  
+        padding: 60px;
+        margin-bottom: 10vh;
+        padding-bottom: -10px;
+        background: var(--vanta_black);
+        border-style: solid;
+        border-color: var(--orange);
+        border-width: 1px;
+        border-radius: 20px;  
+        text-align: center;
           
-    }  
-    #log{  
-        width: 300px;  
-        height: 30px;  
-        border: none;  
-        border-radius: 17px;  
-        padding-left: 7px;  
-        color: blue;  
+}  
+h3{  
+    text-align: center;  
+    color: var(--orange); 
+    margin-top: -40px;
+    font-size: 40px;
+} 
+label{  
+    color: var(--white);  
+    font-size: 17px;  
+}  
+
+#Uname{  
+    width: 300px;  
+    height: 30px;  
+    border: none;  
+    border-radius: 1px;  
+    color: var(--white);
+    background-color: var(--black);
+    border-color: var(--white);
+    border-style: groove;
+    border-width: 2px;
+}  
+#Pass{  
+    width: 300px;  
+    height: 30px;  
+    border: none;  
+    border-radius: 1px;   
+    color: var(--white);
+    background-color: var(--black);
+    border-color: var(--white);
+    border-style: groove;
+    border-width: 2px;
       
-      
-    }  
-    span{  
-        color: white;  
-        font-size: 17px;  
-    }  
-    a{  
-        float: right;  
-        background-color: grey;  
-    }  
+}  
+.button[name="log"] {
+    width: 300px;  
+    height: 30px;  
+    border-radius: 17px;  
+    padding-left: 7px;  
+    border-style: none;
+    color: var(--black);  
+    background-color: var(--orange);
+}
+.button[name="log"]:hover{
+    background-color: var(--light_orange);
+}
+.button[name="log"]:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+.button[name="log"]:active{
+    outline-color: transparent;
+    outline-style:solid;
+    background-color: var(--middle_orange);
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+span{  
+    color: var(--white);  
+    font-size: 17px;  
+}  
+a{
+    color: var(--orange);
+} 
+.botBanner{
+    width:auto;
+    height:50px;
+    background: var(--vanta_black);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    border-top: 1px solid var(--orange);
+}
+label[type="bottom"]{
+    position: fixed;
+    right: 10px;
+    bottom: 15px;
+}

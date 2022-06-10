@@ -1,15 +1,16 @@
     <!DOCTYPE html>    
     <html>    
     <head>    
-        <title>Checkpoint</title>    
+        <title>CheckPoint</title>    
         <link rel="stylesheet" type="text/css" href="css/style.css">    
     </head>    
-    <body>    
-        <h2>Checkpoint</h2><br>
-        <h3>Login</h3><br>    
+    <body> 
+        <img name="logo" src="Images/Icons/Checkpoint_Logo_Large.png" alt="Checkpoint Logo">  
+        <img name="background" src="Images/Backgrounds/Silhouette_Background.png" alt="Silhouettes Background">
         <div class="login">    
-        <form id="login" method="get" action="login.php">    
-            <label><b>User Name     
+        <form id="login" method="get" action="login.php">
+            <h3>Sign In</h3><br>      
+            <label><b>Username     
             </b>    
             </label>    
             <input type="text" name="Uname" id="Uname" placeholder="Username">    
@@ -19,13 +20,16 @@
             </label>    
             <input type="Password" name="Pass" id="Pass" placeholder="Password">    
             <br><br>    
-            <input type="button" name="log" id="log" value="Log In Here">       
+            <button type="button" class="button" name="log" id="log">Login</button>       
             <br><br>    
             <input type="checkbox" id="check">    
             <span>Remember me</span>    
             <br><br>    
-            Forgot <a href="#">Password</a>    
+            <a href="#">Forgot Password</a>    
         </form>     
+    </div>
+    <div class="botBanner">
+        <label type="bottom">© 2022 CheckPoint</label>
     </div>    
     </body>    
     </html>     
