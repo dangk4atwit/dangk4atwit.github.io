@@ -1,19 +1,8 @@
 
-// password validation
-var number_flag = false;
-var lowercase_letter_flag = false;
-var uppercase_letter_flag = false;
-
-// Checks the characters of the password Ex: lower/uper case
-function check_char() {
-    var user_input = document.getElementById("password");
-
-}
-
 // Executes on click of login button.
 function validate() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
+    var username = document.getElementById("Uname").value;
+    var password = document.getElementById("Pass").value;
 
     // clear values after submit button is pressed
     document.getElementById("username").value = "";
