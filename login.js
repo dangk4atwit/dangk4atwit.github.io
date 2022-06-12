@@ -20,7 +20,7 @@ function validate() {
     }
     else {
         alert ("Log in failed. Please Try Again: ");
-        document.getElementById("password").value = "";
+        document.getElementById("password").value = '';
         return false;
 
         }
