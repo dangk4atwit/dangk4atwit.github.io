@@ -17,7 +17,7 @@ function validate() {
         window.location = "sucess.html"; // Redirecting to other page.
     }
     else {
-        alert("Log in failed. Please Try Again: ");
+        alert ("Log in failed. Please Try Again: ");
         return false;
         }
     }
