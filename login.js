@@ -5,7 +5,6 @@ function validate() {
     var password = document.getElementById("Pass").value;
 
     // clear values after submit button is pressed
-    document.getElementById("username").value = "";
     document.getElementById("password").value = "";
 
     if ( username == "admin" && password == "admin"){
