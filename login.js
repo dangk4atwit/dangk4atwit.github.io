@@ -7,8 +7,6 @@ function validate() {
     var username = document.getElementById("Uname").value;
     var password = document.getElementById("Pass").value;
 
-    // clear values after submit button is pressed
-    document.getElementById("password").value = "";
 
     if ( username == "user" && password == "user"){
         alert ("Login successfully");
@@ -22,6 +20,8 @@ function validate() {
     }
     else {
         alert ("Log in failed. Please Try Again: ");
+        document.getElementById("password").value = "";
         return false;
+
         }
     }
