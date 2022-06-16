@@ -93,9 +93,9 @@ label{
       
 }  
 .button[name="log"] {
-    width: 300px;  
+    width: 10vw;  
     height: 50px;  
-    font-size: large;
+    font-size: 1vw;
     border-radius: 17px;  
     padding-left: 7px;  
     border-style: none;
