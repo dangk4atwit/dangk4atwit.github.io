@@ -1,0 +1,19 @@
+<!DOCTYPE html>    
+    <html>    
+    <head>    
+        <meta charset="UTF">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scal=1.0">
+        <title>Register</title>
+    </head>    
+    <body> 
+        <h1>Register Page</h1>
+
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            {{ form.username }}
+            {{ form.password }}
+            {{ form.submit }}
+        <a href="{{url_for('login')}}">Login</a>
+    </body>    
+    </html>     
