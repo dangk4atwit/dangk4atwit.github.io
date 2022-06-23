@@ -16,6 +16,8 @@ body
     background-color: var(--black);  
     font-family: 'Arial';  
     text-align: center;
+    min-height: 200px;
+    min-width: 500px;
 }  
 .logo{
     margin: 0px;
@@ -42,10 +44,10 @@ img[name="background"]{
         top: 50%;
         transform: translate(-50%,-50%);
         width: 367px; 
-        height: 33vh; 
+        height: 270px; 
         overflow: hidden;  
         padding: 60px;
-        margin-bottom: 10vh;
+        position: absolute;
         padding-bottom: 70px;
         background: var(--vanta_black);
         border-style: solid;
@@ -60,7 +62,7 @@ h3{
     color: var(--orange); 
     margin-top: -30px;
     margin-bottom: 0px;
-    font-size: 40px;
+    font-size: 30px;
 } 
 label{  
     color: var(--white);  
@@ -69,7 +71,7 @@ label{
 
 #Uname{  
     width: 300px;  
-    height: 30px;  
+    height: 25px;  
     border: none;  
     border-radius: 5px;  
     color: var(--white);
@@ -81,7 +83,7 @@ label{
 }  
 #Pass{  
     width: 300px;  
-    height: 30px;  
+    height: 25px;  
     border: none;  
     border-radius: 5px;   
     color: var(--white);
@@ -93,9 +95,9 @@ label{
       
 }  
 .button[name="log"] {
-    width: 10vw;  
+    width: 200px;  
     height: 50px;  
-    font-size: 1vw;
+    font-size: 20px;
     border-radius: 17px;  
     padding-left: 7px;  
     border-style: none;
@@ -126,7 +128,7 @@ a{
 } 
 .botBanner{
     width:auto;
-    height:50px;
+    height:7vh;
     background: var(--vanta_black);
     bottom: 0;
     left: 0;
@@ -137,5 +139,6 @@ a{
 label[type="bottom"]{
     position: fixed;
     right: 10px;
-    bottom: 15px;
+    bottom: 2vh;
+    font-size: 2vh;
 }
