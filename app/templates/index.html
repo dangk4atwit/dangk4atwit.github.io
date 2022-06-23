@@ -5,13 +5,8 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">    
     </head>    
     <body> 
-<<<<<<< HEAD:templates/index.html
-        <img name="logo" src="{{ url_for('static', filename='images/icons/Checkpoint_Logo_Large.png') }}" alt="Checkpoint Logo">  
-        <img name="background" src="{{ url_for('static', filename='images/backgrounds/Office_BG.png') }}" alt="Background">
-=======
         <img name="logo" src="{{url_for('static', filename='images/icons/Checkpoint_Logo_Large.png')}}" alt="Checkpoint Logo">  
         <img name="background" src="{{url_for('static', filename='images/backgrounds/Office_BG.png')}}" alt="Background">
->>>>>>> ab3f7422e59d00636e1c57e106d11b9e15518b97:app/templates/index.html
         <div class="login">    
         <form id="login" method="get" action="login.php">
             <h3>Sign In</h3><br>      
@@ -31,7 +26,7 @@
             <span>Remember Me</span>    
             <br><br>    
             <a href="#">Forgot Password?</a>
-            <a href="#">Sign Up</a>      
+            <a href="{{url_for('register')}}">Sign Up</a>      
         </form>     
     </div>
     <div class="botBanner">
