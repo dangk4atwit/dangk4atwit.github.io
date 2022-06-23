@@ -33,7 +33,7 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField("Login")
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     return render_template('login.html', form=form)
