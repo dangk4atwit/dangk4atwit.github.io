@@ -34,13 +34,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 @app.route('/login', methods=['GET', 'POST'])
-def home():
+def login():
     form = LoginForm()
     return render_template('index.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    RegisterForm()
+    form = RegisterForm()
     return render_template('register.html', form=form)
 
 if __name__ == '__main__':
