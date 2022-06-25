@@ -94,7 +94,7 @@ label{
     margin-top: 10px;
       
 }  
-.button[name="log"] {
+#log {
     width: 200px;  
     height: 50px;  
     font-size: 20px;
@@ -105,15 +105,15 @@ label{
     background-color: var(--orange);
     font-weight: bold;
 }
-.button[name="log"]:hover{
+#log:hover{
     background-color: var(--light_orange);
 }
-.button[name="log"]:focus{
+#log:focus{
     outline-color: transparent;
     outline-style: solid;
     box-shadow: 0 0 0 2px var(--dark_orange);
 }
-.button[name="log"]:active{
+#log:active{
     outline-color: transparent;
     outline-style:solid;
     background-color: var(--middle_orange);

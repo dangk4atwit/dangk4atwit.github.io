@@ -1,11 +1,11 @@
 import bcrypt
-from flask import Flask, render_template, url_for, redirect, abort
+from flask import Flask, render_template, url_for, redirect, abort, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from platformdirs import user_runtime_path
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
@@ -22,7 +22,6 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True) # 20 characters
@@ -30,7 +29,8 @@ class User(db.Model, UserMixin):
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Username"})
-    password = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Password"})
+    password = PasswordField(validators=[InputRequired(), Length(min=5, max=25), EqualTo('confirm', message='Passwords must match')], render_kw={"placeholder": "Password"})
+    confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
 
     submit = SubmitField("Register")
 
@@ -41,14 +41,23 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Username"})
-    password = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Password"})
-
+    password = PasswordField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Password"})
+    remember = BooleanField(false_values=(False, 'false', 0, '0'))
     submit = SubmitField("Login")
 
 class DashboardForm(FlaskForm):
     pass
+class ProfileForm(FlaskForm):
+    pass
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = ProfileForm()
+    return render_template('profile.html', form=form)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
     form = DashboardForm()
     return render_template('dashboard.html', form=form)
@@ -61,8 +70,12 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user)
-                return redirect(url_for('success'))
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Incorrect Username or Password', 'danger')
+        else:
+            flash('Incorrect Username or Password', 'danger')
             
     return render_template('login.html', form=form)
 
@@ -78,11 +91,6 @@ def register():
         return redirect(url_for('login'))
     
     return render_template('register.html', form=form)
-
-@app.route('/success', methods=['GET', 'POST'])
-@login_required
-def success():
-    return render_template('success.html')
 
 @app.route('/')
 def home():
