@@ -8,18 +8,12 @@
         <img name="logo" src="{{url_for('static', filename='images/icons/Checkpoint_Logo_Large.png')}}" alt="Checkpoint Logo">  
         <img name="background" src="{{url_for('static', filename='images/backgrounds/Office_BG.png')}}" alt="Background">
         <div class="login">    
-        <form id="login" method="GET" action="login.php">
-            <h3>Sign In</h3><br>      
-            <label name="Uname"><b>Username     
-            </b>
-            </label>    
-            <input type="text" name="Uname" id="Uname" placeholder="Username">    
-            <br><br>    
-            <label name="Pass"><b>Password     
-            </b> 
-            </label>    
-            <input type="Password" name="Pass" id="Pass" placeholder="Password">    
-            <br><br>    
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                {{ form.username }}
+                {{ form.password }}
+                {{ form.submit }}
+            </form>
             <button type="button" class="button" name="log" id="log" onclick="validate()">LOG IN</button>       
             <br><br>    
             <input type="checkbox" id="check">    
