@@ -48,6 +48,7 @@ class LoginForm(FlaskForm):
 class DashboardForm(FlaskForm):
     name = "Test Name"
     title = "Test Title"
+    isAdmin = False
 class ProfileForm(FlaskForm):
     pass
 

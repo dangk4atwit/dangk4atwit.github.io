@@ -19,9 +19,11 @@
       <li><a href="">Verified</a></li>
       <li><a href="{{url_for('login')}}">Logout</a></li>
     </ul>
+    {% if form.isAdmin %}
     <ul class="sidebarMenuInner">
         <li><a href="">Management</a></li>
     </ul>
+    {% endif %}
   </div>
   <div id='center' class="main center">
     <div class="mainInner">
