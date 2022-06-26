@@ -4,6 +4,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
     </head>
 <div class="header"></div>
+<img name="logo" src="{{url_for('static', filename='images/icons/Checkpoint_Logo_Large.png')}}" alt="Checkpoint Logo">  
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
   <label for="openSidebarMenu" class="sidebarIconToggle">
     <div class="spinner diagonal part-1"></div>
@@ -12,17 +13,19 @@
   </label>
   <div id="sidebarMenu">
     <ul class="sidebarMenuInner">
-      <li>Jelena Jovanovic <span>Web Developer</span></li>
-      <li><a href="{{url_for('profile')}}" target="_blank">Profile</a></li>
-      <li><a href="" target="_blank">Timecard</a></li>
-      <li><a href="" target="_blank">Verified</a></li>
-      <li><a href="" target="_blank">Management</a></li>
-      <li><a href="{{url_for('login')}}" target="_blank">Logout</a></li>
+      <li>{{form.name}} <span>{{form.title}}</span></li>
+      <li><a href="{{url_for('profile')}}">Profile</a></li>
+      <li><a href="">Timecard</a></li>
+      <li><a href="">Verified</a></li>
+      <li><a href="{{url_for('login')}}">Logout</a></li>
+    </ul>
+    <ul class="sidebarMenuInner">
+        <li><a href="">Management</a></li>
     </ul>
   </div>
   <div id='center' class="main center">
     <div class="mainInner">
-      <div>PURE CSS SIDEBAR TOGGLE MENU</div>
+      <div>Hello</div>
     </div>
     <div class="mainInner">
       <div>PURE CSS SIDEBAR TOGGLE MENU</div>

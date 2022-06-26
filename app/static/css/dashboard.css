@@ -16,10 +16,17 @@ html, body {
     height: 100%;
 }
 body {
-    background: #fff;
+    background: var(--black);
     padding: 0;
     margin: 0;
     font-family: 'Varela Round', sans-serif;
+}
+img[name="logo"]{
+  display: block;
+  height: 60px!important;
+  position: fixed;
+  z-index: 20;
+  margin-left: 40px;
 }
 .header {
     display: block;
@@ -27,7 +34,7 @@ body {
     width: 100%;
     max-width: 100%;
     box-shadow: none;
-    background-color: #FC466B;
+    background-color: var(--vanta_black);
     position: fixed;
     height: 60px!important;
     overflow: hidden;
@@ -60,7 +67,7 @@ body {
     margin-top: 60px;
     transform: translateX(-250px);
     transition: transform 250ms ease-in-out;
-    background: linear-gradient(180deg, #FC466B 0%, #3F5EFB 100%);
+    background: linear-gradient(90deg, var(--vanta_black) 0%, var(--orange) 100%);
 }
 .sidebarMenuInner{
     margin:0;
@@ -82,7 +89,7 @@ body {
     color: rgba(255, 255, 255, 0.50);
 }
 .sidebarMenuInner li a{
-    color: #fff;
+    color: var(--white);
     text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
@@ -96,6 +103,9 @@ input[type=checkbox] {
     transition: all 0.3s;
     box-sizing: border-box;
     display: none;
+}
+.mainInner {
+  color: var(--white);
 }
 .sidebarIconToggle {
     transition: all 0.3s;
@@ -116,7 +126,7 @@ input[type=checkbox] {
     position: absolute;
     height: 3px;
     width: 100%;
-    background-color: #fff;
+    background-color: var(--white);
 }
 .horizontal {
     transition: all 0.3s;
