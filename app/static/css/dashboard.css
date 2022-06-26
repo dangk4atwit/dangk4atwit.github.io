@@ -39,6 +39,9 @@ img[name="logo"]{
     height: 60px!important;
     overflow: hidden;
     z-index: 10;
+    color: var(--white);
+    font-size: 50;
+    text-align: center;
 }
 .main {
     margin: 0 auto;

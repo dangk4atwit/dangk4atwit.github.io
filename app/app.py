@@ -46,7 +46,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 class DashboardForm(FlaskForm):
-    name = "Test Name"
+    firstName = "Test"
+    lastName = "Name"
     title = "Test Title"
     isAdmin = False
 class ProfileForm(FlaskForm):
