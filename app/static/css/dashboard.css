@@ -4,9 +4,10 @@
     --light_orange: #fac16c;
     --dark_orange: #c47e16;
     --light_grey: #808080;
-    --almost_black: #292929;
     --black: #1b1b1b;
+    --almost_black: #292929;
     --vanta_black: #000000;
+    --black2: #0f0f0f;
     --white: #ffffff;
     --menu-speed: 0.7s;
 }
@@ -23,13 +24,13 @@ body {
 }
 img[name="logo"]{
   display: block;
-  height: 60px!important;
-  position: fixed;
-  z-index: 20;
-  margin-left: 40px;
+  height: 40px!important;
+  margin-left: 10px;
+  margin-right: 20px;
+  margin-top: 10px;
 }
 .header {
-    display: block;
+    display: flex;
     margin: 0 auto;
     width: 100%;
     max-width: 100%;
@@ -39,10 +40,51 @@ img[name="logo"]{
     height: 60px!important;
     overflow: hidden;
     z-index: 10;
+    vertical-align: middle;
     color: var(--white);
     font-size: 50;
     text-align: center;
 }
+
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: var(--vanta_black);
+    overflow: hidden;
+    height: 60px!important;
+}
+  
+/* Style the links inside the navigation bar */
+.topnav div {
+    float: left;
+    height: 60px!important;
+    text-align: center;
+    padding: 16px 16px;
+    align-items: center;
+}
+
+.topnav div a {
+    color: var(--white);
+    text-align: center;
+    padding: 16px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    
+}
+  
+/* Change the color of links on hover */
+.topnav div:hover {
+    background-color: var(--black2);
+}
+
+.topnav div.active a {
+    background-color: var(--black2);
+}
+
+.topnav div.active a {
+    border-bottom: 3px solid var(--orange);
+    font-weight: bold;
+}
+
 .main {
     margin: 0 auto;
     display: block;
@@ -65,21 +107,49 @@ img[name="logo"]{
 #sidebarMenu {
     height: 100%;
     position: fixed;
-    left: 0;
+    right: 0;
     width: 250px;
     margin-top: 60px;
-    transform: translateX(-250px);
+    transform: translateX(250px);
     transition: transform 250ms ease-in-out;
-    background: linear-gradient(90deg, var(--vanta_black) 0%, var(--orange) 100%);
+    opacity: 80%;
+    background: var(--vanta_black);
 }
 .sidebarMenuInner{
     margin:0;
     padding:0;
     border-top: 1px solid rgba(255, 255, 255, 0.10);
 }
+
+.sidebarMenuInnerBottom{
+    margin:0;
+    padding:0;
+    position: absolute;
+    width: 250px;
+    right: 0;
+    bottom: 75;
+    border-top: 1px solid var(--orange);
+}
+.sidebarMenuInnerBottom li{
+    list-style: none;
+    color: var(--white);
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    border-bottom: 1px solid var(--orange);
+}
+.sidebarMenuInnerBottom li a{
+    color: var(--white);
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
 .sidebarMenuInner li{
     list-style: none;
-    color: #fff;
+    color: var(--white);
     text-transform: uppercase;
     font-weight: bold;
     padding: 20px;
@@ -99,9 +169,8 @@ img[name="logo"]{
     text-decoration: none;
 }
 input[type="checkbox"]:checked ~ #sidebarMenu {
-    transform: translateX(0);
+    transform: translateX(-20px);
 }
-
 input[type=checkbox] {
     transition: all 0.3s;
     box-sizing: border-box;
@@ -118,8 +187,8 @@ input[type=checkbox] {
     z-index: 99;
     height: 100%;
     width: 100%;
-    top: 22px;
-    left: 15px;
+    top: 15px;
+    right: 20px;
     height: 22px;
     width: 22px;
 }
@@ -127,7 +196,7 @@ input[type=checkbox] {
     transition: all 0.3s;
     box-sizing: border-box;
     position: absolute;
-    height: 3px;
+    height: 5px;
     width: 100%;
     background-color: var(--white);
 }
@@ -135,36 +204,36 @@ input[type=checkbox] {
     transition: all 0.3s;
     box-sizing: border-box;
     position: relative;
-    float: left;
-    margin-top: 3px;
+    float: right;
+    margin-top: 5px;
 }
 .diagonal.part-1 {
     position: relative;
     transition: all 0.3s;
     box-sizing: border-box;
-    float: left;
+    float: right;
 }
 .diagonal.part-2 {
     transition: all 0.3s;
     box-sizing: border-box;
     position: relative;
-    float: left;
-    margin-top: 3px;
+    float: right;
+    margin-top: 5px;
 }
 input[type=checkbox]:checked ~ .sidebarIconToggle > .horizontal {
     transition: all 0.3s;
     box-sizing: border-box;
-    opacity: 0;
+    opacity: 0; 
 }
 input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-1 {
     transition: all 0.3s;
     box-sizing: border-box;
-    transform: rotate(135deg);
+    transform: rotate(135deg) translateY(-3.5px);
     margin-top: 8px;
 }
 input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-2 {
     transition: all 0.3s;
     box-sizing: border-box;
-    transform: rotate(-135deg);
+    transform: rotate(-135deg) translateY(3.5px);
     margin-top: -9px;
 }
