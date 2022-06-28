@@ -50,8 +50,12 @@ class DashboardForm(FlaskForm):
     lastName = "Name"
     title = "Test Title"
     isAdmin = False
+    
 class ProfileForm(FlaskForm):
-    pass
+    firstName = "Test"
+    lastName = "Name"
+    title = "Test Title"
+    isAdmin = False
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
