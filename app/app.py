@@ -3,12 +3,14 @@ from flask import Flask, render_template, url_for, redirect, abort, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
+from flask_navigation import Navigation
 from platformdirs import user_runtime_path
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+nav = Navigation(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -17,6 +19,11 @@ app.config['SECRET_KEY'] = 'thisisasecretkey'
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
+nav.Bar('top', [
+    nav.Item('Dashboard', 'dashboard'),
+    nav.Item('Profile', 'profile'),
+])
 
 @login_manager.user_loader
 def load_user(user_id):

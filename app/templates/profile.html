@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{form.firstName}}{% endblock %}  
+        {% block title %}{{form.firstName}}'s Profile{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
         {% endblock stylesheet %}
@@ -9,13 +9,13 @@
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Profile Content</div>
       </div>
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Profile Content</div>
       </div>
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Profile Content</div>
       </div>
     </div>
     {% endblock %}

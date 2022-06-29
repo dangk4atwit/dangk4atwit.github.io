@@ -59,7 +59,6 @@ img[name="logo"]{
     height: 60px!important;
     text-align: center;
     padding: 16px 16px;
-    align-items: center;
 }
 
 .topnav div a {
@@ -68,7 +67,7 @@ img[name="logo"]{
     padding: 16px 16px;
     text-decoration: none;
     font-size: 20px;
-    
+    font-weight: bold;
 }
   
 /* Change the color of links on hover */
@@ -76,7 +75,7 @@ img[name="logo"]{
     background-color: var(--black2);
 }
 
-.topnav div.active a {
+.topnav div.active {
     background-color: var(--black2);
 }
 
