@@ -1,40 +1,22 @@
+{% extends 'navigation.html' %}
 <html>
     <head>
-        <title>{{form.firstName}}'s Profile</title>  
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
+        {% block title %}{{form.firstName}}{% endblock %}  
+        {% block stylesheet %}
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
+        {% endblock stylesheet %}
     </head>
-<div class="header"><b>{{form.firstName}}'s Profile</b></div>
-<a href="{{url_for('dashboard')}}"><img name="logo" src="{{url_for('static', filename='images/icons/Checkpoint_Logo_Large.png')}}" alt="Checkpoint Logo"></img></a>
-  <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
-  <label for="openSidebarMenu" class="sidebarIconToggle">
-    <div class="spinner diagonal part-1"></div>
-    <div class="spinner horizontal"></div>
-    <div class="spinner diagonal part-2"></div>
-  </label>
-  <div id="sidebarMenu">
-    <ul class="sidebarMenuInner">
-      <li>{{form.firstName}} {{form.lastName}}<span>{{form.title}}</span></li>
-      <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
-      <li><a href="{{url_for('profile')}}">Profile</a></li>
-      <li><a href="">Timecard</a></li>
-      <li><a href="">Verified</a></li>
-      <li><a href="{{url_for('login')}}">Logout</a></li>
-    </ul>
-    {% if form.isAdmin %}
-    <ul class="sidebarMenuInner">
-        <li><a href="">Management</a></li>
-    </ul>
-    {% endif %}
-  </div>
-  <div id='center' class="main center">
-    <div class="mainInner">
-      <div>Dashboard Content</div>
+    {% block content %}
+    <div id='center' class="main center">
+      <div class="mainInner">
+        <div>Dashboard Content</div>
+      </div>
+      <div class="mainInner">
+        <div>Dashboard Content</div>
+      </div>
+      <div class="mainInner">
+        <div>Dashboard Content</div>
+      </div>
     </div>
-    <div class="mainInner">
-      <div>Dashboard Content</div>
-    </div>
-    <div class="mainInner">
-      <div>Dashboard Content</div>
-    </div>
-  </div>
+    {% endblock %}
 </html>
