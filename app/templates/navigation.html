@@ -24,10 +24,11 @@
   <div id="sidebarMenu">
     <ul class="sidebarMenuInner">
       <li>{{form.firstName}} {{form.lastName}}<span>{{form.title}}</span></li>
-      <li><a href="{{url_for('dashboard')}}">Dashboard</a></li>
-      <li><a href="{{url_for('profile')}}">Profile</a></li>
-      <li><a href="">Timecard</a></li>
-      <li><a href="">Verified</a></li>
+      {% for item in nav.top %}
+        <li>
+          <a href="{{ item.url }}">{{item.label}}</a>
+        </li>
+      {% endfor %}
     </ul>
     {% if form.isAdmin %}
     <ul class="sidebarMenuInner">
@@ -38,6 +39,8 @@
       <li><a href="{{url_for('login')}}">Logout</a></li>
     </ul>
   </div>
-  {% block content %}
-  {% endblock %}
+  <body>
+    {% block content %}
+    {% endblock %}
+  </body>
 </html>

@@ -1,0 +1,38 @@
+{% extends 'navigation.html' %}
+<html>
+    <head>
+        {% block title %}{{form.firstName}}'s Timecard{% endblock %}  
+        {% block stylesheet %}
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/timecard.css') }}">
+        {% endblock stylesheet %}
+    </head>
+    {% block content %}
+    <div id='center' class="main center">
+        <div class = "mainInner">
+            <div>
+                <table>
+                    <tr>
+                        <th>Sunday</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                    </tr>
+                    <tr>
+                        <td>Alfreds Futterkiste</td>
+                        <td>Maria Anders</td>
+                        <td>Germany</td>
+                    </tr>
+                    <tr>
+                        <td>Centro comercial Moctezuma</td>
+                        <td>Francisco Chang</td>
+                        <td>Mexico</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+</html>

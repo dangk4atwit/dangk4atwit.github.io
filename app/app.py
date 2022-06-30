@@ -1,3 +1,4 @@
+from audioop import add
 import bcrypt
 from flask import Flask, render_template, url_for, redirect, abort, flash
 from flask_sqlalchemy import SQLAlchemy
@@ -23,6 +24,8 @@ login_manager.login_view = "login"
 nav.Bar('top', [
     nav.Item('Dashboard', 'dashboard'),
     nav.Item('Profile', 'profile'),
+    nav.Item('Timecard', 'timecard'),
+    nav.Item('Verify', 'verify'),
 ])
 
 @login_manager.user_loader
@@ -58,23 +61,94 @@ class DashboardForm(FlaskForm):
     title = "Test Title"
     isAdmin = False
     
-class ProfileForm(FlaskForm):
+class TimecardForm(FlaskForm):
     firstName = "Test"
     lastName = "Name"
     title = "Test Title"
     isAdmin = False
+    
+class VerifyForm(FlaskForm):
+    firstName = "Test"
+    lastName = "Name"
+    title = "Test Title"
+    isAdmin = False
+    
+class ProfileForm(FlaskForm):
+    firstName = "Admin"
+    lastName = "Admin"
+    title = "Administrator"
+    isAdmin = True
+    
+class ManagementForm(FlaskForm):
+    firstName = "Admin"
+    lastName = "Admin"
+    title = "Administrator"
+    isAdmin = False
+
+def adaptAdmin():
+    nav.Bar('top', [
+            nav.Item('Dashboard', 'dashboard'),
+            nav.Item('Profile', 'profile'),
+            nav.Item('Timecard', 'timecard'),
+            nav.Item('Verify', 'verify'),
+            nav.Item('Management', 'management'),])
+    
+def adaptRegular():
+    nav.Bar('top', [
+    nav.Item('Dashboard', 'dashboard'),
+    nav.Item('Profile', 'profile'),
+    nav.Item('Timecard', 'timecard'),
+    nav.Item('Verify', 'verify'),])
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     form = ProfileForm()
+    if form.isAdmin:
+        adaptAdmin()
+    else:
+        adaptRegular()
     return render_template('profile.html', form=form)
+
+@app.route('/management', methods=['GET', 'POST'])
+@login_required
+def management():
+    form = ManagementForm()
+    if form.isAdmin:
+        adaptAdmin()
+    else:
+        adaptRegular()
+    return render_template('management.html', form=form)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     form = DashboardForm()
+    if form.isAdmin:
+        adaptAdmin()
+    else:
+        adaptRegular()
     return render_template('dashboard.html', form=form)
+
+@app.route('/timecard', methods=['GET', 'POST'])
+@login_required
+def timecard():
+    form = TimecardForm()
+    if form.isAdmin:
+        adaptAdmin()
+    else:
+        adaptRegular()
+    return render_template('timecard.html', form=form)
+
+@app.route('/verify', methods=['GET', 'POST'])
+@login_required
+def verify():
+    form = VerifyForm()
+    if form.isAdmin:
+        adaptAdmin()
+    else:
+        adaptRegular()
+    return render_template('verify.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

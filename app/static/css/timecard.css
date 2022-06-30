@@ -1,5 +1,6 @@
 @import "navigation.css";
 
+
 .main {
     margin: 0 auto;
     display: block;
@@ -22,4 +23,15 @@
     font-size: 3em;
     font-weight: bold;
     letter-spacing: 1.25px;
+}
+
+.mainInner div table{
+    grid-template-columns: 7;
+    grid-template-rows: 30px!important;
+    grid-template-columns: 30px!important;
+}
+
+.mainInner div table, th, td {
+    border: 1px solid var(--orange);
+    border-collapse: collapse;
 }

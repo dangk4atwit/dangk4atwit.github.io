@@ -1,21 +1,21 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{form.firstName}}'s Dashboard{% endblock %}  
+        {% block title %}{{form.firstName}}'s Verification{% endblock %}  
         {% block stylesheet %}
-          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/verify.css') }}">
         {% endblock stylesheet %}
     </head>
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Verify Content</div>
       </div>
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Verify Content</div>
       </div>
       <div class="mainInner">
-        <div>Dashboard Content</div>
+        <div>Verify Content</div>
       </div>
     </div>
     {% endblock %}

@@ -17,7 +17,7 @@ html, body {
     height: 100%;
 }
 body {
-    background: var(--black);
+    background: var(--black2);
     padding: 0;
     margin: 0;
     font-family: 'Varela Round', sans-serif;
@@ -84,14 +84,8 @@ img[name="logo"]{
     font-weight: bold;
 }
 
-.main {
-    margin: 0 auto;
-    display: block;
-    height: 100%;
-    margin-top: 60px;
-}
-
 #sidebarMenu {
+    z-index: 1000;
     height: 100%;
     position: fixed;
     right: 0;
@@ -154,23 +148,6 @@ img[name="logo"]{
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
-}
-
-.mainInner {
-    color: var(--white);
-}
-.mainInner{
-    display: table;
-    height: 100%;
-    width: 100%;
-    text-align: center;
-}
-.mainInner div{
-    display:table-cell;
-    vertical-align: middle;
-    font-size: 3em;
-    font-weight: bold;
-    letter-spacing: 1.25px;
 }
 
 input[type="checkbox"]:checked ~ #sidebarMenu {
