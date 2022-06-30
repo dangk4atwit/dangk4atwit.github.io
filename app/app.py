@@ -30,7 +30,10 @@ nav.Bar('top', [
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    user = User.query.get(int(user_id))
+    if user is None:
+        flash('You have been automatically logged out')
+    return user
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -197,8 +200,9 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/')
+@login_required
 def home():
-    return redirect(url_for('login'))
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
