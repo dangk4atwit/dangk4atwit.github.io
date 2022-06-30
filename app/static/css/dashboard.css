@@ -9,6 +9,7 @@
 }
 .mainInner {
     color: var(--white);
+    background-color: var(--black);
 }
 .mainInner{
     display: table;

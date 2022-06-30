@@ -15,10 +15,8 @@
           <div>
             <img class= "profileImage" src="{{form.profileImageSrc}}" alt="No Picture Found" />
           </div>
-          <div class="name">{{form.firstName}} {{form.lastName}} {{form.pronouns}}
-            <div class="employeeNum" alt="Employee Number">{{form.employeeNum}}</div>
-          </div>
-          <div class="position"> {{form.title}} </div>
+          <div class="name">{{form.firstName}} {{form.lastName}} {{form.pronouns}}</div>
+          <div class="position">{{form.title}}</div>
           <div class="card employment">
             <div class= "contentTitle">Employment Information</div>
             <div class="item">
@@ -30,11 +28,11 @@
                 <p>Supervisor/Manager</p>
               </div>
               <div class="itemBody">
-                <p>admin@checkpointmail.com{{form.employmentType}}</p>
-                <p>000000001{{form.employeeID}}</p>
-                <p>Part Time{{form.employmentType}}</p>
-                <p>${{form.payRate}}420/century{{form.payInterval}}</p>
-                <p>Big Boss{{form.superior}}</p>
+                <p>{{form.employmentEmail}}</p>
+                <p>{{form.employeeID}}</p>
+                <p>{{form.employmentType}}</p>
+                <p>${{form.payRate}}/{{form.payInterval}}</p>
+                <p>{{form.superior}}</p>
               </div>
             </div>
           </div>
@@ -48,9 +46,9 @@
                 <p>President</p>
               </div>
               <div class="itemBody">
-                <p>Wentworth Institute of Technology{{form.orgName}}</p>
-                <p>550 Huntington Ave, Boston, MA 02115{{form.orgAddress}}</p>
-                <p>Mark A. Thompson{{form.orgLeader}}</p>
+                <p>{{form.orgName}}</p>
+                <p>{{form.orgAddress}}</p>
+                <p>{{form.orgLeader}}</p>
               </div>
             </div>
           </div>

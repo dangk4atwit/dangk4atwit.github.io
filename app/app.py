@@ -76,7 +76,17 @@ class VerifyForm(FlaskForm):
 class ProfileForm(FlaskForm):
     firstName = "Admin"
     lastName = "Admin"
+    pronouns="(He/Him)"
     title = "Administrator"
+    employmentEmail = "admin@checkpointmail.com"
+    employeeID = "0000000001";
+    employmentType = "Tenure"
+    payRate = 420
+    payInterval = "century"
+    superior = "Mr. Boss"
+    orgName = "Wentworth Institute of Technology"
+    orgAddress="550 Huntington Ave, Boston, MA 02115"
+    orgLeader="Mark A. Thompson"
     isAdmin = True
     
 class ManagementForm(FlaskForm):
