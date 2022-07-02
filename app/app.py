@@ -58,8 +58,8 @@ class RegisterForm(FlaskForm):
     fname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "First Name"})
     lname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Last Name"})
     email = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Email"})
-    username = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Username"})
-    password = PasswordField(validators=[InputRequired(), Length(min=5, max=25), EqualTo('confirm', message='Passwords must match')], render_kw={"placeholder": "Password"})
+    username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], render_kw={"placeholder": "Password"})
     confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
 
     submit = SubmitField("Register")
@@ -70,8 +70,8 @@ class RegisterForm(FlaskForm):
             raise ValidationError("That user is already registered.")
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Username"})
-    password = PasswordField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Password"})
+    username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Password"})
     remember = BooleanField(false_values=(False, 'false', 0, '0'))
     submit = SubmitField("Login")
 
