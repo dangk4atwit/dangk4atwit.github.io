@@ -1,0 +1,24 @@
+<!DOCTYPE html>    
+    <html>    
+    <head>    
+        <meta charset="UTF">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scal=1.0">
+        <title>Register</title>
+    </head>    
+    <body> 
+        <h1>Register Organization Page</h1>
+
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <br> {{ form.orgName }}
+            <br> {{ form.phoneorg }}
+            <br> {{ form.des }}
+            <br> {{ form.orgAddress}}
+            <br> {{ form.submit }}
+            <br> 
+        <a href="{{url_for('register')}}">User Register</a>
+        <a href="{{url_for('login')}}">Login</a>
+    </body>    
+    </html>     
+ 

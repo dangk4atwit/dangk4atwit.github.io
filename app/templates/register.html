@@ -12,12 +12,20 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             {{ form.fname }}
-            {{ form.lname }}
-            {{ form.email }}
-            {{ form.username }}
-            {{ form.password }}
-            {{ form.confirm }}
-            {{ form.submit }}
+            <br> {{ form.lname }}
+            <br> {{ form.email }}
+            <br> {{ form.username }}
+            <br> {{ form.password }}
+            <br> {{ form.confirm }}
+            <br> {{ form.workId }}
+            <br> {{ form.pronouns }}
+            <br> {{ form.phone }}
+            <br> {{ form.etype }}
+            <br> {{ form.pay }}
+            <br> {{ form.payInt}}
+            <br> {{ form.submit }}
+            <br> 
+        <a href="{{url_for('orgregister')}}">Organization Register</a>
         <a href="{{url_for('login')}}">Login</a>
     </body>    
     </html>     
