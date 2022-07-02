@@ -41,6 +41,7 @@ def load_user(user_id):
     return user
 
 class User(db.Model, UserMixin):
+    
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(80), nullable=False)
     lname = db.Column(db.String(80), nullable=False)
@@ -138,7 +139,7 @@ class OrgRegisterForm(FlaskForm):
 
     submit = SubmitField("Register")
 
-@app.route('/orgregister', methods=['GET', 'POST'])
+@app.route('/org_register', methods=['GET', 'POST'])
 def org_register():
     form = OrgRegisterForm()
     
