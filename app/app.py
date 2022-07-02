@@ -38,13 +38,15 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False)
+    fname = db.Column(db.String(80), nullable=False)
+    lname = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
     username = db.Column(db.String(20), nullable=False, unique=True) # 20 characters
     password = db.Column(db.String(80), nullable=False)  # 80 characters
 
-    def __init__(self, name, email, username, password):
-        self.name = name
+    def __init__(self, fname, lname, email, username, password):
+        self.fname = fname
+        self.lname = lname
         self.email = email
         self.username = username
         self.password = password
@@ -53,7 +55,8 @@ db.create_all()
 db.session.commit()
 
 class RegisterForm(FlaskForm):
-    name = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Name"})
+    fname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "First Name"})
+    lname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Last Name"})
     email = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Email"})
     username = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=5, max=25), EqualTo('confirm', message='Passwords must match')], render_kw={"placeholder": "Password"})
@@ -206,7 +209,7 @@ def register():
     
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(name=form.name.data, email=form.email.data, username=form.username.data, password=hashed_password)
+        new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data, username=form.username.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
