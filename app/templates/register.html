@@ -11,6 +11,8 @@
 
         <form method="POST" action="">
             {{ form.hidden_tag() }}
+            {{ form.name }}
+            {{ form.email }}
             {{ form.username }}
             {{ form.password }}
             {{ form.confirm }}
@@ -18,3 +20,4 @@
         <a href="{{url_for('login')}}">Login</a>
     </body>    
     </html>     
+ 
