@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{form.firstName}}'s Profile{% endblock %}  
+        {% block title %}{{form.fname}}'s Profile{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
         {% endblock stylesheet %}
@@ -15,7 +15,7 @@
           <div>
             <img class= "profileImage" src="{{form.profileImageSrc}}" alt="No Picture Found" />
           </div>
-          <div class="name">{{form.firstName}} {{form.lastName}} {{form.pronouns}}</div>
+          <div class="name">{{current_user.fname}} {{current_user.lname}} {{form.pronouns}}</div>
           <div class="position">{{form.title}}</div>
           <div class="card employment">
             <div class= "contentTitle">Employment Information</div>
