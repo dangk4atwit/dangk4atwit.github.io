@@ -76,7 +76,7 @@ class RegisterForm(FlaskForm):
     fname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "First Name"})
     lname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Last Name"})
     email = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Email"})
-    workId = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Id"})
+    workId = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Id"})
     pronouns = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Pronouns"})
     phone = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Phone"})
     etype = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Employee Type"})
