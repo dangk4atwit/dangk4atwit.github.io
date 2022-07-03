@@ -99,7 +99,9 @@ def register():
     
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data, username=form.username.data, password=hashed_password)
+        new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data, username=form.username.data, password=hashed_password,
+        workId=form.workId.data, pronouns=form.pronouns.data, phone=form.phone.data, etype=form.etype.data, pay=form.pay.data,
+        payInt=form.payInt.data)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
