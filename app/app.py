@@ -70,6 +70,7 @@ class RegisterForm(FlaskForm):
     lname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Last Name"})
     email = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Email"})
     workId = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"placeholder": "Id"})
+    workId = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Id"})
     pronouns = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Pronouns"})
     phone = StringField(validators=[InputRequired(), Length(min=10, max=15)], render_kw={"placeholder": "Phone"})
     etype = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Employee Type"})
@@ -116,6 +117,9 @@ def register():
                         username=form.username.data, password=hashed_password, workId=form.workId.data,
                         pronouns=form.pronouns.data, phone=form.phone.data, etype=form.etype.data,
                         pay=int(round(form.pay.data, 2)*100), payInt=form.payInt.data, pImgURL=form.profileImgUrl.data)
+        new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data, username=form.username.data, password=hashed_password,
+        workId=form.workId.data, pronouns=form.pronouns.data, phone=form.phone.data, etype=form.etype.data, pay=form.pay.data,
+        payInt=form.payInt.data)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
