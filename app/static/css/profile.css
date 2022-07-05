@@ -33,11 +33,11 @@
     height: 200px;
     width: 200px;
     z-index: 9;
-    background-color: var(--vanta_black);
     border: 5px solid var(--orange);
     border-radius: 50%;
     position: relative;
     bottom: 100px;
+    background-color: var(--white);
 }
 
 .name {
