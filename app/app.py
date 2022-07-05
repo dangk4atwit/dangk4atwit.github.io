@@ -12,6 +12,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
 from flask_bcrypt import Bcrypt
 import phonenumbers
+from datetime import datetime, timedelta
 
 nav = Navigation(app)   
 bcrypt = Bcrypt(app)
@@ -20,6 +21,8 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
+current_day = 0
 
 nav.Bar('top', [
     nav.Item('Dashboard', 'dashboard'),
@@ -36,7 +39,7 @@ def load_user(user_id):
     return user
 
 def isAdmin():
-    if str(current_user.workId)[0:1] == "69":
+    if str(current_user.workId)[0:2] == "69":
         return True
     return False
 
@@ -60,9 +63,8 @@ def adaptAdmin():
 
 
 
-
-
 ####################################################            FORMS & PAGES              #################################################################################
+
 
 
 class RegisterForm(FlaskForm):
@@ -129,15 +131,33 @@ class OrgRegisterForm(FlaskForm):
     phoneorg = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Phone Number"})
     des = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Description"})
     orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Organization Address"})
-
+    logoURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
+    bannerURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
+    checkTimecard = BooleanField(validators=[InputRequired()])
+    checkMask = BooleanField(validators=[InputRequired()])
+    checkSymptom = BooleanField(validators=[InputRequired()])
     submit = SubmitField("Register")
+
+    def validate_phone(self, phoneorg):
+        try:
+            p = phonenumbers.parse(phoneorg.data, None)
+            if not phonenumbers.is_valid_number(p):
+                print("Phone Number valid number")
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError) as e:
+            print(phoneorg.data)
+            print("Phone Number format")
+            print(e)
+            raise ValidationError('Invalid phone number')
 
 @app.route('/org_register', methods=['GET', 'POST'])
 def org_register():
     form = OrgRegisterForm()
     
     if form.validate_on_submit():
-        new_org = Org(orgName=form.orgName.data, phoneorg=form.phoneorg.data, des=form.des.data, orgAddress=form.orgAddress.data)
+        new_org = Org(orgName=form.orgName.data, phoneorg=form.phoneorg.data, des=form.des.data, orgAddress=form.orgAddress.data,
+                    logoURL=form.logoURL.data, bannerURL=form.bannerURL.data, checkTimecard=form.checkTimecard.data, checkMask=form.checkMask.data, 
+                    checkSymptom=form.checkSymptom.data)
         db.session.add(new_org)
         db.session.commit()
         return redirect(url_for('login'))

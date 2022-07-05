@@ -32,7 +32,7 @@
                 <p>{{current_user.workId}}</p>
                 <p>{{current_user.etype}}</p>
                 <p>${{current_user.pay/100.0}}/{{current_user.payInt}}</p>
-                <p>{{current_user.superior}}</p>
+                <p>{% if current_user.superior == "" %}None{% endif %}{{current_user.superior}}</p>
               </div>
             </div>
           </div>

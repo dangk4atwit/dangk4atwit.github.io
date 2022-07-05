@@ -30,11 +30,6 @@
         </li>
       {% endfor %}
     </ul>
-    {% if form.isAdmin %}
-    <ul class="sidebarMenuInner">
-        <li><a href="">Management</a></li>
-    </ul>
-    {% endif %}
     <ul class="sidebarMenuInnerBottom">
       <li><a href="{{url_for('logout')}}">Logout</a></li>
     </ul>

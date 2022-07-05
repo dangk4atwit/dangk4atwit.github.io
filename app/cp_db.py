@@ -55,13 +55,21 @@ class Org(db.Model, UserMixin):
     orgAddress = db.Column(db.String(20), nullable=False, unique=True) 
     logoURL = db.Column(db.String(120), nullable=False)
     bannerURL = db.Column(db.String(120), nullable=False)
+    checkTimecard = db.Column(db.Boolean, nullable=False)
+    checkMask = db.Column(db.Boolean, nullable=False)
+    checkSymptom = db.Column(db.Boolean, nullable=False)
     
 
-    def __init__(self, orgName, phoneorg, des, orgAddress):
+    def __init__(self, orgName, phoneorg, des, orgAddress, logoURL, bannerURL, checkTimecard, checkMask, checkSymptom):
         self.orgName = orgName
         self.phoneorg = phoneorg
         self.des = des
         self.orgAddress = orgAddress
+        self.logoURL = logoURL
+        self.bannerURL = bannerURL
+        self.checkTimecard = checkTimecard
+        self.checkMask = checkMask
+        self.checkSymptom = checkSymptom
         
 db.create_all()
 db.session.commit()

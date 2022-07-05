@@ -20,16 +20,15 @@
                         <th>Friday</th>
                         <th>Saturday</th>
                     </tr>
-                    <tr>
-                        <td>Alfreds Futterkiste</td>
-                        <td>Maria Anders</td>
-                        <td>Germany</td>
-                    </tr>
-                    <tr>
-                        <td>Centro comercial Moctezuma</td>
-                        <td>Francisco Chang</td>
-                        <td>Mexico</td>
-                    </tr>
+                        <tr>
+                            {% for i in range(7) %}
+                                <td>
+                                    <div><a href=""><Button type="button" onclick="{% set current_day = i %}">
+
+                                    </a></div>
+                                </td>
+                            {% endfor %}
+                        </tr>
                 </table>
             </div>
         </div>
