@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{current_user.fname}}'s Profile{% endblock %}  
+        {% block title %}{{form.fname}}'s Profile{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
         {% endblock stylesheet %}
@@ -13,7 +13,7 @@
             <img class= "bannerImage" src="{{form.bannerImageSrc}}" alt="No Picture Found" />
           </div>
           <div>
-            <img class= "profileImage" src="{{current_user.profileImageURL}}" onerror="if (this.src != '{{url_for('static', filename='images/defaults/defaultProfile.png')}}') this.src = '{{url_for('static', filename='images/defaults/defaultProfile.png')}}';"/>
+            <img class= "profileImage" src="{{form.profileImageSrc}}" alt="No Picture Found" />
           </div>
           <div class="name">{{current_user.fname}} {{current_user.lname}} {{form.pronouns}}</div>
           <div class="position">{{form.title}}</div>
@@ -22,6 +22,7 @@
             <div class="item">
               <div class= "itemHeader">
                 <p>Work Email</p>
+                <p>Phone Number</p>
                 <p>Employee ID</p>
                 <p>Employment Type</p>
                 <p>Pay Rate</p>
@@ -29,9 +30,10 @@
               </div>
               <div class="itemBody">
                 <p>{{current_user.email}}</p>
+                <p>{{current_user.phone}}
                 <p>{{current_user.workId}}</p>
                 <p>{{current_user.etype}}</p>
-                <p>${{current_user.pay/100.0}}/{{current_user.payInt}}</p>
+                <p>${{current_user.pay}}/{{current_user.payInt}}</p>
                 <p>{{current_user.superior}}</p>
               </div>
             </div>

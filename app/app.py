@@ -36,7 +36,7 @@ def load_user(user_id):
     return user
 
 def isAdmin():
-    if str(current_user.workId)[0:1] == "69":
+    if str(current_user.workId)[0:2] == "69":
         return True
     return False
 
