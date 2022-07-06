@@ -25,13 +25,54 @@
     letter-spacing: 1.25px;
 }
 
-.mainInner div table{
-    grid-template-columns: 7;
-    grid-template-rows: 30px!important;
-    grid-template-columns: 30px!important;
+.mainInner div table, th, td {
+    border: 1px solid var(--vanta_black);
+    border-collapse: collapse;
 }
 
-.mainInner div table, th, td {
-    border: 1px solid var(--orange);
-    border-collapse: collapse;
+table {
+    table-layout: auto;
+    border-collapse: separate;
+    width: 80%;
+    border-radius: 20px;
+    border-color: var(--vanta_black);
+}
+
+th {
+    color: var(--white);
+    background-color: var(--vanta_black)
+}
+
+tr td form{
+    white-space: nowrap;
+    align-items: center;
+    text-align: center;
+}
+
+form div {
+    white-space: nowrap;
+    align-items: center;
+    text-align: center;
+}
+
+.dayNum {
+    color: var(--white)
+}
+
+.current {
+    color: var(--orange)!important;
+}
+
+.calbtns {
+    font-weight: bold;
+    height: 200px;
+    width: 200px;
+    font-size: 50;
+    color: var(--orange);
+    background-color: var(--black2);
+}
+
+.calbtns:hover {
+    background-color: var(--vanta_black);
+    color: var(--dark_orange);
 }

@@ -10,10 +10,10 @@
       <div id='center' class="main center">
         <div class="mainInner">
           <div>
-            <img class= "bannerImage" src="{{form.bannerImageSrc}}" alt="No Picture Found" />
+            <img class= "bannerImage" src="{{form.bannerImageSrc}}"/>
           </div>
           <div>
-            <img class= "profileImage" src="{{form.profileImageSrc}}" alt="No Picture Found" />
+            <img class= "profileImage" src="{{current_user.profileImageURL}}" onerror="if (this.src != '{{url_for('static', filename='images/defaults/defaultProfile.png')}}') this.src = '{{url_for('static', filename='images/defaults/defaultProfile.png')}}';"/>
           </div>
           <div class="name">{{current_user.fname}} {{current_user.lname}} {{form.pronouns}}</div>
           <div class="position">{{form.title}}</div>
@@ -33,7 +33,7 @@
                 <p>{{current_user.phone}}
                 <p>{{current_user.workId}}</p>
                 <p>{{current_user.etype}}</p>
-                <p>${{current_user.pay/100.0}}/{{current_user.payInt}}</p>
+                <p>${{'%0.2f'|format(current_user.pay/100.00)}}/{{current_user.payInt}}</p>
                 <p>{% if current_user.superior == "" %}None{% endif %}{{current_user.superior}}</p>
               </div>
             </div>
@@ -48,9 +48,9 @@
                 <p>President</p>
               </div>
               <div class="itemBody">
-                <p>{{form.orgName}}</p>
-                <p>{{form.orgAddress}}</p>
-                <p>{{form.orgLeader}}</p>
+                <p>{{curr_org.orgName}}</p>
+                <p>{{curr_org.orgAddress}}</p>
+                <p>{{curr_org.orgLeader}}</p>
               </div>
             </div>
           </div>

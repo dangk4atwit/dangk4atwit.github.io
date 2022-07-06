@@ -1,8 +1,8 @@
 from audioop import add
 from enum import unique
-from cp_db import User, Org, app, db
+from cp_db import User, Org, app, db, get_org
 import bcrypt
-from flask import render_template, url_for, redirect, abort, flash
+from flask import render_template, url_for, redirect, abort, flash, request
 # from flask_modals import Modal, render_template_modal
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -12,7 +12,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
 from flask_bcrypt import Bcrypt
 import phonenumbers
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 nav = Navigation(app)   
 bcrypt = Bcrypt(app)
@@ -23,6 +23,7 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 current_day = 0
+curr_timecard_index = 0
 
 nav.Bar('top', [
     nav.Item('Dashboard', 'dashboard'),
@@ -39,8 +40,9 @@ def load_user(user_id):
     return user
 
 def isAdmin():
-    if str(current_user.workId)[0:2] == "69":
-        return True
+    if current_user != None:
+        if str(current_user.workId)[0:2] == "69":
+            return True
     return False
 
 def adaptRegular():
@@ -60,6 +62,43 @@ def adaptAdmin():
             nav.Item('Management', 'management'),])
     else:
         adaptRegular()
+
+
+def getWeeks():
+    pay_interval = ""
+    week_count = 0
+    if current_user != None:
+        pay_interval = str(current_user.payInt)
+    
+    if "weekly" in pay_interval:
+        week_count = 1
+        if "bi" in pay_interval:
+            week_count += 1
+    return week_count
+
+def getLastSunday():
+    today = date.today()
+    idx = (today.weekday() + 1) % 7
+    sun = today - timedelta(idx)
+    return sun
+
+def getSundayBefore():
+    sun = getLastSunday()
+    return sun - timedelta(days=7)
+
+def getListOfDayVals(days, sunday):
+    dayNums = []
+    for i in range(days):
+        dayNums.append((sunday + timedelta(days=i)).day)
+    return dayNums
+
+def determineBiweeklyStart():
+    sun = getLastSunday()
+    referenceDate = date(2017, 1, 1)
+    currentHalf = ((referenceDate - sun).days/7)%2
+    if currentHalf == 0:
+        return sun
+    return getSundayBefore()
 
 
 
@@ -133,9 +172,9 @@ class OrgRegisterForm(FlaskForm):
     orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Organization Address"})
     logoURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
     bannerURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
-    checkTimecard = BooleanField(validators=[InputRequired()])
-    checkMask = BooleanField(validators=[InputRequired()])
-    checkSymptom = BooleanField(validators=[InputRequired()])
+    checkTimecard = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+    checkMask = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+    checkSymptom = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
     submit = SubmitField("Register")
 
     def validate_phone(self, phoneorg):
@@ -191,6 +230,7 @@ def login():
 
 
 
+
 class DashboardForm(FlaskForm):
     firstName = "Test"
     lastName = "Name"
@@ -203,25 +243,56 @@ def dashboard():
     form = DashboardForm()
     adaptAdmin()
     return render_template('dashboard.html', form=form)
-    
-    
-    
-    
+
+
+
+
 class TimecardForm(FlaskForm):
-    firstName = "Test"
-    lastName = "Name"
-    title = "Test Title"
-    isAdmin = False
-    
+    def __init__(self, amount, sunday):
+        self.dayVals = getListOfDayVals(amount, sunday)
+
 @app.route('/timecard', methods=['GET', 'POST'])
 @login_required
 def timecard():
-    form = TimecardForm()
+    if "bi" in current_user.payInt.lower():
+        form = TimecardForm(getWeeks()*7, determineBiweeklyStart())
+    else:
+        form = TimecardForm(getWeeks()*7, getLastSunday())
     adaptAdmin()
-    return render_template('timecard.html', form=form)
+    return render_template('timecard.html', form=form, weeks = getWeeks(), today=date.today().day)
 
 
+
+
+
+@app.route('/load_timecard_modal', methods=['GET', 'POST'])
+@login_required
+def loadModal():
+    if request.method == "POST":
+        id = request.form["id"]
+        global curr_timecard_index
+        curr_timecard_index = int(id)
+        return redirect(url_for("timecard_modal"))
+
+
+
+
+
+class Timecard_ModalForm(FlaskForm):
+    pass
+
+@app.route('/timecard_modal')
+@login_required
+def timecard_modal():
+    form = Timecard_ModalForm()
+    global curr_timecard_index
+    print(curr_timecard_index)
+    adaptAdmin()
+    return render_template('tc-modal.html', form=form)
     
+
+
+
 class VerifyForm(FlaskForm):
     firstName = "Test"
     lastName = "Name"
@@ -238,27 +309,15 @@ def verify():
 
     
 class ProfileForm(FlaskForm):
-    firstName = "Admin"
-    lastName = "Admin"
-    pronouns="(He/Him)"
-    title = "Administrator"
-    employmentEmail = "admin@checkpointmail.com"
-    employeeID = "0000000001";
-    employmentType = "Tenure"
-    payRate = 420
-    payInterval = "century"
-    superior = "Mr. Boss"
-    orgName = "Wentworth Institute of Technology"
-    orgAddress="550 Huntington Ave, Boston, MA 02115"
-    orgLeader="Mark A. Thompson"
-    isAdmin = True
+    isAdmin = isAdmin()
     
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     form = ProfileForm()
+    curr_org = get_org(1)
     adaptAdmin()
-    return render_template('profile.html', form=form)    
+    return render_template('profile.html', form=form, curr_org=curr_org)    
 
     
     

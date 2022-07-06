@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{form.firstName}}'s Timecard{% endblock %}  
+        {% block title %}{{current_user.fName}}'s Timecard{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/timecard.css') }}">
         {% endblock stylesheet %}
@@ -10,26 +10,37 @@
     <div id='center' class="main center">
         <div class = "mainInner">
             <div>
-                <table>
-                    <tr>
-                        <th>Sunday</th>
-                        <th>Monday</th>
-                        <th>Tuesday</th>
-                        <th>Wednesday</th>
-                        <th>Thursday</th>
-                        <th>Friday</th>
-                        <th>Saturday</th>
-                    </tr>
+                {% if weeks > 0 %}
+                    <table>
                         <tr>
-                            {% for i in range(7) %}
-                                <td>
-                                    <div><a href=""><Button type="button" onclick="{% set current_day = i %}">
-
-                                    </a></div>
-                                </td>
-                            {% endfor %}
+                            <th>Sunday</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
                         </tr>
-                </table>
+                            {% for i in range(weeks) %}
+                                <tr>
+                                    {% for i in range(i*7, i*7+7, 1) %}
+                                        <td>
+                                            <form action='/load_timecard_modal' method='POST'>
+                                                {% if form.dayVals[i] == today %}
+                                                    <div class="current dayNum">{{form.dayVals[i]}}</div>
+                                                {% endif %}
+                                                {% if form.dayVals[i] != today %}
+                                                    <div class="dayNum">{{form.dayVals[i]}}</div>
+                                                {% endif %}
+                                                <input type='hidden' value={{i}} name='id'/>
+                                                <input type='submit' value="+" class="calbtns"/>
+                                            </form>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                    </table>
+                {% endif %}
             </div>
         </div>
     </div>

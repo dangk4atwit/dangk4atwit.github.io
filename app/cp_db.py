@@ -99,3 +99,7 @@ db.session.commit()
 if __name__ == '__main__':
     db.drop_all()
     app.run(debug=True)
+
+def get_org(_id):
+    org = Org.query.filter_by(id=_id).first()
+    return org
