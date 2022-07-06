@@ -28,8 +28,7 @@
                                             <form action='/load_timecard_modal' method='POST'>
                                                 {% if form.dayVals[i] == today %}
                                                     <div class="current dayNum">{{form.dayVals[i]}}</div>
-                                                {% endif %}
-                                                {% if form.dayVals[i] != today %}
+                                                {% else %}
                                                     <div class="dayNum">{{form.dayVals[i]}}</div>
                                                 {% endif %}
                                                 <input type='hidden' value={{i}} name='id'/>

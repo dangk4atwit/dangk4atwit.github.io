@@ -23,14 +23,19 @@
     font-size: 3em;
     font-weight: bold;
     letter-spacing: 1.25px;
+    text-align: center;
+    align-items: center;
 }
 
 .mainInner div table, th, td {
     border: 1px solid var(--vanta_black);
     border-collapse: collapse;
+    text-align: center;
 }
 
-table {
+.mainInner div table {
+    margin: auto;
+    position: relative;
     table-layout: auto;
     border-collapse: separate;
     width: 80%;
@@ -40,10 +45,12 @@ table {
 
 th {
     color: var(--white);
-    background-color: var(--vanta_black)
+    background-color: var(--vanta_black);
+    font-size:30px;
 }
 
 tr td form{
+    margin: 0 auto;
     white-space: nowrap;
     align-items: center;
     text-align: center;
@@ -64,6 +71,7 @@ form div {
 }
 
 .calbtns {
+    margin: 0 auto;
     font-weight: bold;
     height: 200px;
     width: 200px;
