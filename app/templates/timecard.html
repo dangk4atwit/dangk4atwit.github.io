@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{current_user.fName}}'s Timecard{% endblock %}  
+        {% block title %}{{current_user.fname}}'s Timecard{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/timecard.css') }}">
         {% endblock stylesheet %}
