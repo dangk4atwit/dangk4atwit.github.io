@@ -1,6 +1,5 @@
 @import "navigation.css";
 
-
 .main {
     margin: 0 auto;
     display: block;
@@ -49,11 +48,27 @@ th {
     font-size:30px;
 }
 
+th:first-child {
+    border-top-left-radius: 20px;
+}
+
+th:last-child {
+    border-top-right-radius: 20px;
+}
+
 tr td form{
     margin: 0 auto;
     white-space: nowrap;
     align-items: center;
     text-align: center;
+}
+
+tr:last-child td:first-child {
+    border-bottom-left-radius: 20px;
+}
+
+tr:last-child td:last-child {
+    border-bottom-right-radius: 20px;
 }
 
 form div {
