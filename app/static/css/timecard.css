@@ -14,9 +14,10 @@
     display: table;
     height: 100%;
     width: 100%;
+    align-items: center;
     text-align: center;
 }
-.mainInner div{
+.mainInner div.tableContainer{
     display:table-cell;
     vertical-align: middle;
     font-size: 3em;
@@ -46,6 +47,7 @@ th {
     color: var(--white);
     background-color: var(--vanta_black);
     font-size:30px;
+    font-weight: bold;
 }
 
 th:first-child {
@@ -66,15 +68,23 @@ tr td form{
 tr:last-child td:first-child {
     border-bottom-left-radius: 20px;
 }
+tr:last-child td:first-child form .calbtns{
+    border-bottom-left-radius: 20px;
+}
 
 tr:last-child td:last-child {
+    border-bottom-right-radius: 20px;
+}
+tr:last-child td:last-child form .calbtns{
     border-bottom-right-radius: 20px;
 }
 
 form div {
     white-space: nowrap;
     align-items: center;
-    text-align: center;
+    text-align: left;
+    font-size: 40;
+    font-weight: bold;
 }
 
 .dayNum {

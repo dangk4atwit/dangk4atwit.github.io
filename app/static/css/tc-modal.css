@@ -1,0 +1,28 @@
+@import "timecard.css";
+
+.blur {
+    position: absolute!important;
+    z-index: 99!important;
+    margin: 0 auto!important;
+    height: 100vh!important;
+    width: 100vw!important;
+    background-color: var(--white)!important;
+    opacity: 50%!important;
+    filter: blur(8px)!important;
+    background-size: cover!important;
+    display: block!important;
+    top: 60px;
+    left: 0;
+}
+
+.modal {
+    position: absolute!important;
+    margin: 0 auto;
+    top: 60px;
+    left: 37.5%;
+    text-align: center!important;
+    z-index: 100!important;
+    height: 300px!important;
+    width: 500px!important;
+    background-color: var(--black)!important;
+}

@@ -1,0 +1,55 @@
+{% extends 'navigation.html' %}
+<html>
+    <head>
+        {% block title %}{{current_user.fname}}'s Timecard{% endblock %}  
+        {% block stylesheet %}
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tc-modal.css') }}">
+        {% endblock stylesheet %}
+    </head>
+    {% block content %}
+    <div id='center' class="main center">
+        <div class = "mainInner">
+            <div class="tableContainer">
+                {% if weeks > 0 %}
+                    <table>
+                        <tr>
+                            <th>Sunday</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                        </tr>
+                            {% for i in range(weeks) %}
+                                <tr>
+                                    {% for i in range(i*7, i*7+7, 1) %}
+                                        <td>
+                                            <form action='/load_timecard_modal' method='POST'>
+                                                {% if dayVals[i] == today %}
+                                                    <div class="current dayNum">{{dayVals[i]}}</div>
+                                                {% else %}
+                                                    <div class="dayNum">{{dayVals[i]}}</div>
+                                                {% endif %}
+                                                <input type='hidden' value={{i}} name='id'/>
+                                                <input type='submit' value="+" class="calbtns"/>
+                                            </form>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                    </table>
+                {% endif %}
+            </div>
+            <div class="blur"></div>
+            <div class=" modal">
+                <form method="POST" action="">
+                    <Label class="modal-title"> Enter hours for {{form.date}} </Label>
+                    <br>{{ form.hours(id_="Hours") }}
+                    <br>{{ form.submit(id_="Submit") }}
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+</html>

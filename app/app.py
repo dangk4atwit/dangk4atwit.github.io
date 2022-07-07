@@ -92,6 +92,13 @@ def getListOfDayVals(days, sunday):
         dayNums.append((sunday + timedelta(days=i)).day)
     return dayNums
 
+def getListOfDayDates(days, sunday):
+    dayNums = []
+    for i in range(days):
+        newDay = (sunday + timedelta(days=i))
+        dayNums.append([newDay.month, newDay.day, newDay.year].join("/"))
+    return dayNums
+
 def determineBiweeklyStart():
     sun = getLastSunday()
     referenceDate = date(2017, 1, 1)
@@ -250,6 +257,7 @@ def dashboard():
 class TimecardForm(FlaskForm):
     def __init__(self, amount, sunday):
         self.dayVals = getListOfDayVals(amount, sunday)
+    
 
 @app.route('/timecard', methods=['GET', 'POST'])
 @login_required
@@ -279,16 +287,68 @@ def loadModal():
 
 
 class Timecard_ModalForm(FlaskForm):
-    pass
 
-@app.route('/timecard_modal')
+    hours = StringField(validators=[InputRequired(), Length(min=1, max=5)], render_kw={"placeholder": "Hours"})
+    submit = SubmitField("Submit Hours")
+    
+    def validate_hours(self, hours):
+        h = str(hours.data)
+        try: 
+            if ":" in h:
+                HM = h.split(":")
+                print(HM)
+                if (int(HM[0]) == 0 and int(HM[1]) == 0) or (int(HM[0]) > 24) or ((int(HM[1]) > 59)) or (int(HM[0]) < 0) or (int(HM[1]) < 0):
+                    print("invalid hours")
+                    raise ValidationError('Please enter valid hours')
+            else:
+                print("Printing whole: " + h)
+                print(len(h) > 4)
+                if len(h) > 4:
+                    print("Too many characters")
+                    raise ValidationError('Please enter valid hours')
+                else:
+                    print(len(h) > 2)
+                    if len(h) > 2:
+                        if int(h[: len(h)-2]) > 24 or int(h[: len(h)-2]) < 0:
+                            print("Hours too large")
+                            raise ValidationError('Please enter valid hours')
+                        elif int(h[len(h)-2:]) > 59 or int(h[len(h)-2:]) < 0:
+                            print("minutes too large")
+                            raise ValidationError('Please enter valid hours')
+                    else:
+                        print(int(h) < 0 or int(h) > 24)
+                        if int(h) < 0 or int(h) > 24:
+                            print("value error")
+                            raise ValidationError('Please enter valid hours')
+        except Exception as e:
+            raise ValidationError('Please enter valid hours')
+
+
+
+@app.route('/timecard_modal', methods=['GET', 'POST'])
 @login_required
 def timecard_modal():
     form = Timecard_ModalForm()
-    global curr_timecard_index
-    print(curr_timecard_index)
     adaptAdmin()
-    return render_template('tc-modal.html', form=form)
+    if "bi" in current_user.payInt.lower():
+        dayVals = getListOfDayVals(getWeeks()*7, determineBiweeklyStart())
+    else:
+        dayVals = getListOfDayVals(getWeeks()*7, getLastSunday())
+
+    if form.validate_on_submit():
+        h = str(form.hours.data)
+        if ":" not in h:
+            print("inputing : inbetween")
+            if len(h) > 2:
+                print("inputing : inbetween")
+                h = [h[: len(h)-2],h [len(h)-2:]].join(":")
+            else:
+                print("extending with : ")
+                h = [h,"00"].join(":")
+                
+        return redirect(url_for('timecard'))
+        
+    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=date.today().day, dayVals = dayVals)
     
 
 
