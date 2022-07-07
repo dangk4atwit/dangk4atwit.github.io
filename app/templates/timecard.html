@@ -32,7 +32,7 @@
                                                     <div class="dayNum">{{form.dayVals[i]}}</div>
                                                 {% endif %}
                                                 <input type='hidden' value={{i}} name='id'/>
-                                                <input type='submit' value="+" class="calbtns"/>
+                                                <input type='submit' value={{curr_timecard_hours[i]}} class="calbtns"/>
                                             </form>
                                         </td>
                                     {% endfor %}

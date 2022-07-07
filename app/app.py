@@ -24,6 +24,7 @@ login_manager.login_view = "login"
 
 current_day = 0
 curr_timecard_index = 0
+curr_timecard_hours = []
 
 nav.Bar('top', [
     nav.Item('Dashboard', 'dashboard'),
@@ -98,6 +99,20 @@ def getListOfDayDates(days, sunday):
         newDay = (sunday + timedelta(days=i))
         dayNums.append([newDay.month, newDay.day, newDay.year].join("/"))
     return dayNums
+
+def getTimecardHours(startDate, timecardDays):
+    global curr_timecard_hours
+    #Get hours from database for current date
+    #If doesnt exist, generate new empty timecard
+    if curr_timecard_hours == []:
+        for i in range(len(timecardDays)):
+            curr_timecard_hours.append("0")
+
+def setTimecardHour(hours):
+    global curr_timecard_hours
+    global curr_timecard_index
+
+    curr_timecard_hours[curr_timecard_index] = hours
 
 def determineBiweeklyStart():
     sun = getLastSunday()
@@ -266,8 +281,10 @@ def timecard():
         form = TimecardForm(getWeeks()*7, determineBiweeklyStart())
     else:
         form = TimecardForm(getWeeks()*7, getLastSunday())
+    getTimecardHours("None", form.dayVals)
+    global curr_timecard_hours
     adaptAdmin()
-    return render_template('timecard.html', form=form, weeks = getWeeks(), today=date.today().day)
+    return render_template('timecard.html', form=form, weeks = getWeeks(), today=date.today().day, curr_timecard_hours=curr_timecard_hours)
 
 
 
@@ -334,21 +351,23 @@ def timecard_modal():
         dayVals = getListOfDayVals(getWeeks()*7, determineBiweeklyStart())
     else:
         dayVals = getListOfDayVals(getWeeks()*7, getLastSunday())
-
+    global curr_timecard_hours
     if form.validate_on_submit():
         h = str(form.hours.data)
         if ":" not in h:
             print("inputing : inbetween")
             if len(h) > 2:
                 print("inputing : inbetween")
-                h = [h[: len(h)-2],h [len(h)-2:]].join(":")
+                h = ":".join([h[: len(h)-2],h [len(h)-2:]])
             else:
                 print("extending with : ")
-                h = [h,"00"].join(":")
+                h = ":".join([h,"00"])
                 
+        #Put hours into database
+        setTimecardHour(h)
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=date.today().day, dayVals = dayVals)
+    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=date.today().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 
 
