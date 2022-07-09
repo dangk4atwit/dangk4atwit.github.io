@@ -313,18 +313,17 @@ class Timecard_ModalForm(FlaskForm):
         try: 
             if ":" in h:
                 HM = h.split(":")
-                print(HM)
                 if (int(HM[0]) == 0 and int(HM[1]) == 0) or (int(HM[0]) > 24) or ((int(HM[1]) > 59)) or (int(HM[0]) < 0) or (int(HM[1]) < 0):
                     print("invalid hours")
                     raise ValidationError('Please enter valid hours')
+                if int(HM[0]) == 24 and int(HM[1]) > 0:
+                    print("invalid hours")
+                    raise ValidationError('Please enter valid hours')
             else:
-                print("Printing whole: " + h)
-                print(len(h) > 4)
                 if len(h) > 4:
                     print("Too many characters")
                     raise ValidationError('Please enter valid hours')
                 else:
-                    print(len(h) > 2)
                     if len(h) > 2:
                         if int(h[: len(h)-2]) > 24 or int(h[: len(h)-2]) < 0:
                             print("Hours too large")
@@ -332,8 +331,10 @@ class Timecard_ModalForm(FlaskForm):
                         elif int(h[len(h)-2:]) > 59 or int(h[len(h)-2:]) < 0:
                             print("minutes too large")
                             raise ValidationError('Please enter valid hours')
+                        elif int(h[: len(h)-2]) == 24 and int(h[len(h)-2:]) > 0:
+                            print("Above max time")
+                            raise ValidationError('Please enter valid hours')
                     else:
-                        print(int(h) < 0 or int(h) > 24)
                         if int(h) < 0 or int(h) > 24:
                             print("value error")
                             raise ValidationError('Please enter valid hours')
