@@ -23,7 +23,7 @@ login_manager.init_app(app)
 login_manager.login_view = "login"
 
 current_day = 0
-curr_timecard_index = 0
+curr_timecard_index = -1
 curr_timecard_hours = []
 
 nav.Bar('top', [
@@ -346,6 +346,9 @@ class Timecard_ModalForm(FlaskForm):
 @app.route('/timecard_modal', methods=['GET', 'POST'])
 @login_required
 def timecard_modal():
+    global curr_timecard_index
+    if curr_timecard_index == -1:
+        return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
     adaptAdmin()
     if "bi" in current_user.payInt.lower():
@@ -366,6 +369,7 @@ def timecard_modal():
                 
         #Put hours into database
         setTimecardHour(h)
+        curr_timecard_index = -1
         return redirect(url_for('timecard'))
         
     return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=date.today().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
