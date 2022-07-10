@@ -9,7 +9,8 @@ db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_BINDS'] = {
     'organization': 'sqlite:///organizations.db',
-    'timecard': 'sqlite:///timecards.db'
+    'timecard': 'sqlite:///timecards.db',
+    'clock' : 'sqlite:///clocks.db'
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -83,7 +84,7 @@ class Org(db.Model, UserMixin):
         self.checkMask = checkMask
         self.checkSymptom = checkSymptom
         
-db.create_all()
+
 db.create_all(bind=['organization'])
 db.session.commit()
         
@@ -117,8 +118,25 @@ class Time(db.Model, UserMixin):
         self.total = total
         self.state = state
 
-db.create_all()
+
 db.create_all(bind=['timecard'])
+db.session.commit()
+
+class Clock(db.Model, UserMixin):
+    __bind_key__ = 'clock'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    clock_in = db.Column(db.String(10), nullable=False)
+    clocked_out = db.Column(db.Boolean, nullable=False)
+    info={'bind_key':'clock'}
+    
+    def __init__(self, user_id, clock_in, clocked_out):
+        self.user_id = user_id
+        self.clock_in = clock_in
+        self.clocked_out = clocked_out
+
+
+db.create_all(bind=['clock'])
 db.session.commit()
 
 def get_org(_id):
@@ -132,6 +150,10 @@ def get_time(_id, start_week):
 def get_user(_id):
     user = User.query.filter_by(workId=_id).first()
     return user
+
+def get_clock_in(_id):
+    clock = Clock.query.filter_by(user_id=_id).first()
+    return clock
 
 if __name__ == '__main__':
     db.create_all()

@@ -1,7 +1,7 @@
 from audioop import add
 from enum import unique
 import this
-from cp_db import User, Org, Time, app, db, get_org, get_time, get_user
+from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request
 # from flask_modals import Modal, render_template_modal
