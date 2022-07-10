@@ -27,9 +27,11 @@ class User(db.Model, UserMixin):
     pay = db.Column(db.Integer, nullable=False)
     payInt = db.Column(db.String(80), nullable=False)
     pImgURL = db.Column(db.String(120), nullable=False)
+    super_id = db.Column(db.Integer, nullable=False)
+    orga_id = db.Column(db.Integer, nullable=False)
     
     def __init__(self, fname, lname, email, username, password, workId, pronouns, phone,
-    etype, pay, payInt, pImgURL="None"):
+    etype, pay, payInt, super_id, orga_id,pImgURL="None"):
         self.fname = fname
         self.lname = lname
         self.email = email
@@ -42,6 +44,8 @@ class User(db.Model, UserMixin):
         self.pay = pay
         self.payInt = payInt
         self.pImgURL = pImgURL
+        self.super_id = super_id
+        self.orga_id = orga_id
         
 db.create_all()
 db.session.commit()

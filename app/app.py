@@ -204,6 +204,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], 
     render_kw={"placeholder": "Password"})
     profileImgUrl = StringField(validators=[Length(max=120)], render_kw={"placeholder": "Profile Image URL"})
+    
     confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
 
     submit = SubmitField("Register")
@@ -241,7 +242,8 @@ def register():
         new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data,
                         username=form.username.data, password=hashed_password, workId=form.workId.data,
                         pronouns=form.pronouns.data, phone=form.phone.data, etype=form.etype.data,
-                        pay=int(round(form.pay.data, 2)*100), payInt=form.payInt.data, pImgURL=form.profileImgUrl.data)
+                        pay=int(round(form.pay.data, 2)*100), payInt=form.payInt.data, pImgURL=form.profileImgUrl.data,
+                        super_id=form.super_id.data, orga_id=form.orga_id.data)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -476,7 +478,11 @@ def verify():
 
     
 class ProfileForm(FlaskForm):
-    isAdmin = isAdmin()
+    def __init__(self):
+        if "week" in str(current_user.payInt).lower():
+            self.payInt = "hour"
+        else:
+            self.payInt = "year"
     
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -484,6 +490,7 @@ def profile():
     form = ProfileForm()
     curr_org = get_org(1)
     adaptAdmin()
+
     return render_template('profile.html', form=form, curr_org=curr_org)    
 
     
