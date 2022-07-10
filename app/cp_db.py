@@ -77,8 +77,8 @@ db.session.commit()
 class Time(db.Model, UserMixin):
     __bind_key__ = 'timecard'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(99999999), nullable=False, unique=True)
-    start_week= db.Column(db.Integer, nullable=False, unique=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    start_week= db.Column(db.String(10), nullable=False)
     sunday = db.Column(db.String(5), nullable=False)
     monday = db.Column(db.String(5), nullable=False)
     tuesday = db.Column(db.String(5), nullable=False)
@@ -86,14 +86,11 @@ class Time(db.Model, UserMixin):
     thursday = db.Column(db.String(5), nullable=False)
     friday = db.Column(db.String(5), nullable=False)
     saturday = db.Column(db.String(5), nullable=False)
-    total = db.Column(db.String(40), nullable=False)
-    submit = db.Column(db.Boolean, nullable=False)
-    none = db.Column(db.Boolean, nullable=False)
-    approved = db.Column(db.Boolean, nullable=False)
-    declined = db.Column(db.Boolean, nullable=False)
+    total = db.Column(db.String(5), nullable=False)
+    state = db.Column(db.String(20), nullable=False)
     
     def __init__(self, user_id, start_week, sunday, monday, tuesday, wednesday, thursday, friday,
-    saturday, total, submit, none, approved, declined):
+    saturday, total, state):
         self.user_id = user_id
         self.start_week = start_week
         self.sunday = sunday
@@ -104,21 +101,19 @@ class Time(db.Model, UserMixin):
         self.friday = friday
         self.saturday = saturday
         self.total = total
-        self.submit = submit
-        self.none = none
-        self.approved = approved
-        self.declined = declined
+        self.state = state
+
 db.create_all()
 db.session.commit()
-
-if __name__ == '__main__':
-    db.drop_all()
-    app.run(debug=True)
 
 def get_org(_id):
     org = Org.query.filter_by(id=_id).first()
     return org
 
-def get_time(_id):
-    time = Time.query.filter_by(user_id=_id).first()
+def get_time(_id, start_week):
+    time = Time.query.filter_by(user_id=_id, start_week=start_week).first()
     return time
+
+if __name__ == '__main__':
+    #db.drop_all()
+    app.run(debug=True)

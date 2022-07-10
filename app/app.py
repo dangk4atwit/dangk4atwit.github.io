@@ -1,6 +1,7 @@
 from audioop import add
 from enum import unique
-from cp_db import User, Org, app, db, get_org
+import this
+from cp_db import User, Org, app, db, Time, get_org, get_time
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request
 # from flask_modals import Modal, render_template_modal
@@ -22,7 +23,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-current_day = 0
 curr_timecard_index = -1
 curr_timecard_hours = []
 
@@ -97,16 +97,42 @@ def getListOfDayDates(days, sunday):
     dayNums = []
     for i in range(days):
         newDay = (sunday + timedelta(days=i))
-        dayNums.append([newDay.month, newDay.day, newDay.year].join("/"))
+        dayNums.append("/".join([str(newDay.month), str(newDay.day), str(newDay.year)]))
     return dayNums
 
 def getTimecardHours(startDate, timecardDays):
+    
+    time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+    
+    if time == None:
+        generateEmptyTimecard(startDate)
+        time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+    fillCurrTime(time, True)
+    if len(timecardDays) > 7:
+        nextDate = startDate + timedelta(days=7)
+        nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+        if nextTime == None:
+            generateEmptyTimecard(nextDate)
+            nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+        fillCurrTime(nextTime, False) 
+
+def generateEmptyTimecard(startDate):
+    newTime = Time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]), "0", "0", "0", "0", "0", "0", "0", "0", "none")
+    db.session.add(newTime)
+    db.session.commit()
+    
+
+def fillCurrTime(time, reset):
     global curr_timecard_hours
-    #Get hours from database for current date
-    #If doesnt exist, generate new empty timecard
-    if curr_timecard_hours == []:
-        for i in range(len(timecardDays)):
-            curr_timecard_hours.append("0")
+    if reset:
+        curr_timecard_hours = []
+    curr_timecard_hours.append(time.sunday)
+    curr_timecard_hours.append(time.monday)
+    curr_timecard_hours.append(time.tuesday)
+    curr_timecard_hours.append(time.wednesday)
+    curr_timecard_hours.append(time.thursday)
+    curr_timecard_hours.append(time.friday)
+    curr_timecard_hours.append(time.saturday)
 
 def setTimecardHour(hours):
     global curr_timecard_hours
@@ -122,6 +148,42 @@ def determineBiweeklyStart():
         return sun
     return getSundayBefore()
 
+def calculateTotalHours():
+    global curr_timecard_hours
+    totalHours = 0
+    totalMinutes = 0
+    for t in curr_timecard_hours:
+        if t != "0":
+            HM = t.split(":")
+            totalHours += int(HM[0])
+            totalMinutes += int(HM[1])
+    totalHours += int(totalMinutes/60)
+    totalMinutes = totalMinutes % 60
+    return ":".join([str(totalHours),str(totalMinutes)])
+        
+
+def saveTimecard(startDate, status):
+    global curr_timecard_hours
+    if curr_timecard_hours == []:
+        return
+    time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+    db.session.delete(time)
+    db.session.commit()
+    newTime = Time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]), curr_timecard_hours[0], 
+    curr_timecard_hours[1], curr_timecard_hours[2], curr_timecard_hours[3], curr_timecard_hours[4], curr_timecard_hours[5], 
+    curr_timecard_hours[6], calculateTotalHours(), status)
+    db.session.add(newTime)
+    db.session.commit()
+    if len(curr_timecard_hours) > 7:
+        nextDate = startDate + timedelta(days=7)
+        nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+        db.session.delete(nextTime)
+        db.session.commit()
+        nextNewTime = Time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]), curr_timecard_hours[7], 
+        curr_timecard_hours[8], curr_timecard_hours[9], curr_timecard_hours[10], curr_timecard_hours[11], curr_timecard_hours[12], 
+        curr_timecard_hours[13], calculateTotalHours(), status)
+        db.session.add(nextNewTime)
+        db.session.commit()
 
 
 ####################################################            FORMS & PAGES              #################################################################################
@@ -139,7 +201,8 @@ class RegisterForm(FlaskForm):
     pay = FloatField(validators=[InputRequired(), NumberRange(min=7.25)], render_kw={"placeholder": "Pay Rate"})
     payInt = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Pay Interval"})
     username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
-    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], render_kw={"placeholder": "Password"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], 
+    render_kw={"placeholder": "Password"})
     profileImgUrl = StringField(validators=[Length(max=120)], render_kw={"placeholder": "Profile Image URL"})
     confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
 
@@ -270,19 +333,39 @@ def dashboard():
 
 
 class TimecardForm(FlaskForm):
-    def __init__(self, amount, sunday):
+    saveDraft = SubmitField("Save Draft")
+    submit = SubmitField("Submit Timecard")
+    def __init__(self, amount, sunday, *args, **kwargs):
+        super(TimecardForm, self).__init__(*args, **kwargs)
         self.dayVals = getListOfDayVals(amount, sunday)
     
 
 @app.route('/timecard', methods=['GET', 'POST'])
 @login_required
 def timecard():
-    if "bi" in current_user.payInt.lower():
-        form = TimecardForm(getWeeks()*7, determineBiweeklyStart())
-    else:
-        form = TimecardForm(getWeeks()*7, getLastSunday())
-    getTimecardHours("None", form.dayVals)
     global curr_timecard_hours
+    
+    if "bi" in current_user.payInt.lower():
+        startDate = determineBiweeklyStart()
+        form = TimecardForm(amount=getWeeks()*7, sunday=startDate)
+    else:
+        startDate = getLastSunday()
+        form = TimecardForm(amount=getWeeks()*7, sunday=getLastSunday())
+    
+    if curr_timecard_hours == []:
+        getTimecardHours(startDate, form.dayVals)
+    
+    if form.validate_on_submit():
+        if form.saveDraft.data:
+            print("Saving Draft")
+            saveTimecard(startDate, "none")
+
+        else:
+            print("Submitting")
+            saveTimecard(startDate, "submitted")
+            
+        curr_timecard_hours = []
+        return redirect(url_for('dashboard'))
     adaptAdmin()
     return render_template('timecard.html', form=form, weeks = getWeeks(), today=date.today().day, curr_timecard_hours=curr_timecard_hours)
 

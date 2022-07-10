@@ -39,6 +39,13 @@
                                 </tr>
                             {% endfor %}
                     </table>
+                    <div>
+                        <form method="POST" action="">
+                            {{ form.hidden_tag() }}
+                            {{form.saveDraft}}
+                            {{form.submit}}
+                        </form>
+                    </div>
                 {% endif %}
             </div>
         </div>
