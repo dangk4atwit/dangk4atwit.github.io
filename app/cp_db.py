@@ -129,6 +129,10 @@ def get_time(_id, start_week):
     time = Time.query.filter_by(user_id=_id, start_week=start_week).first()
     return time
 
+def get_user(_id):
+    user = User.query.filter_by(workId=_id).first()
+    return user
+
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)

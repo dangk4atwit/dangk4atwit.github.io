@@ -26,7 +26,7 @@
                 <p>Employee ID</p>
                 <p>Employment Type</p>
                 <p>Pay Rate</p>
-                <p>Supervisor/Manager</p>
+                {% if form.supervisor != "" %}<p>Supervisor/Manager</p>{% endif %} 
               </div>
               <div class="itemBody">
                 <p>{{current_user.email}}</p>
@@ -34,7 +34,7 @@
                 <p>{{current_user.workId}}</p>
                 <p>{{current_user.etype}}</p>
                 <p>${{'%0.2f'|format(current_user.pay/100.0)}}/{{form.payInt}}</p>
-                <p>{% if current_user.superior == "" %}None{% endif %}{{current_user.superior}}</p>
+                {% if form.supervisor != "" %}<p>{{form.supervisor}}</p>{% endif %} 
               </div>
             </div>
           </div>
@@ -50,7 +50,7 @@
               <div class="itemBody">
                 <p>{{curr_org.orgName}}</p>
                 <p>{{curr_org.orgAddress}}</p>
-                <p>{{curr_org.orgLeader}}</p>
+                <p>{{curr_org.ceo}}</p>
               </div>
             </div>
           </div>

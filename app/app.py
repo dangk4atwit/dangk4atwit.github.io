@@ -1,7 +1,7 @@
 from audioop import add
 from enum import unique
 import this
-from cp_db import User, Org, Time, app, db, get_org, get_time
+from cp_db import User, Org, Time, app, db, get_org, get_time, get_user
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request
 # from flask_modals import Modal, render_template_modal
@@ -45,6 +45,15 @@ def isAdmin():
         if str(current_user.workId)[0:2] == "69":
             return True
     return False
+
+def get_super_name():
+    if current_user.super_id == 1000000:
+        return ""
+    s = get_user(current_user.super_id)
+    if s == None:
+        return ""
+    return " ".join([s.fname,s.lname])
+
 
 def adaptRegular():
     nav.Bar('top', [
@@ -487,6 +496,8 @@ class ProfileForm(FlaskForm):
             self.payInt = "hour"
         else:
             self.payInt = "year"
+        self.supervisor = get_super_name()
+
     
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
