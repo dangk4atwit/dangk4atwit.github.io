@@ -74,27 +74,42 @@ class Org(db.Model, UserMixin):
 db.create_all()
 db.session.commit()
         
-#class Time(db.Model, UserMixin):
-    # __bind_key__ = 'timecard'
-
+class Time(db.Model, UserMixin):
+    __bind_key__ = 'timecard'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(99999999), nullable=False, unique=True)
+    start_week= db.Column(db.Integer, nullable=False, unique=True)
+    sunday = db.Column(db.String(5), nullable=False)
+    monday = db.Column(db.String(5), nullable=False)
+    tuesday = db.Column(db.String(5), nullable=False)
+    wednesday = db.Column(db.String(5), nullable=False)
+    thursday = db.Column(db.String(5), nullable=False)
+    friday = db.Column(db.String(5), nullable=False)
+    saturday = db.Column(db.String(5), nullable=False)
+    total = db.Column(db.String(40), nullable=False)
+    submit = db.Column(db.Boolean, nullable=False)
+    none = db.Column(db.Boolean, nullable=False)
+    approved = db.Column(db.Boolean, nullable=False)
+    declined = db.Column(db.Boolean, nullable=False)
     
-    
-
-    # def __init__(self, fname, lname, email, username, password, workId, pronouns, phone,
-    # etype, pay, payInt):
-    #     self.fname = fname
-    #     self.lname = lname
-    #     self.email = email
-    #     self.username = username
-    #     self.password = password
-    #     self.workId = workId
-    #     self.pronouns = pronouns
-    #     self.phone = phone
-    #     self.etype = etype
-    #     self.pay = pay
-    #     self.payInt = payInt
-#db.create_all()
-#db.session.commit()
+    def __init__(self, user_id, start_week, sunday, monday, tuesday, wednesday, thursday, friday,
+    saturday, total, submit, none, approved, declined):
+        self.user_id = user_id
+        self.start_week = start_week
+        self.sunday = sunday
+        self.monday = monday
+        self.tuesday = tuesday
+        self.wednesday = wednesday
+        self.thursday = thursday
+        self.friday = friday
+        self.saturday = saturday
+        self.total = total
+        self.submit = submit
+        self.none = none
+        self.approved = approved
+        self.declined = declined
+db.create_all()
+db.session.commit()
 
 if __name__ == '__main__':
     db.drop_all()
@@ -103,3 +118,7 @@ if __name__ == '__main__':
 def get_org(_id):
     org = Org.query.filter_by(id=_id).first()
     return org
+
+def get_time(_id):
+    time = Time.query.filter_by(user_id=_id).first()
+    return time
