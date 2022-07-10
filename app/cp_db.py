@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from sqlalchemy import null
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -10,7 +11,9 @@ app.config['SQLALCHEMY_BINDS'] = {
     'organization': 'sqlite:///organizations.db',
     'timecard': 'sqlite:///timecards.db'
 }
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
+
 
 class User(db.Model, UserMixin):
     
@@ -31,7 +34,7 @@ class User(db.Model, UserMixin):
     orga_id = db.Column(db.Integer, nullable=False)
     
     def __init__(self, fname, lname, email, username, password, workId, pronouns, phone,
-    etype, pay, payInt, super_id, orga_id,pImgURL="None"):
+    etype, pay, payInt, super_id, orga_id, pImgURL="None"):
         self.fname = fname
         self.lname = lname
         self.email = email
@@ -54,28 +57,34 @@ class Org(db.Model, UserMixin):
     __bind_key__ = 'organization'
     id = db.Column(db.Integer, primary_key=True)
     orgName = db.Column(db.String(80), nullable=False)
+    orgid = db.Column(db.Integer, nullable=False)
+    ceo = db.Column(db.String(80), nullable=False)
     phoneorg = db.Column(db.String(80), nullable=False)
-    des = db.Column(db.String(80), nullable=False, unique=True)
+    des = db.Column(db.String(200), nullable=False, unique=True)
     orgAddress = db.Column(db.String(20), nullable=False, unique=True) 
     logoURL = db.Column(db.String(120), nullable=False)
     bannerURL = db.Column(db.String(120), nullable=False)
     checkTimecard = db.Column(db.Boolean, nullable=False)
     checkMask = db.Column(db.Boolean, nullable=False)
     checkSymptom = db.Column(db.Boolean, nullable=False)
+    info={'bind_key':'organization'}
     
 
-    def __init__(self, orgName, phoneorg, des, orgAddress, logoURL, bannerURL, checkTimecard, checkMask, checkSymptom):
+    def __init__(self, orgName, phoneorg, des, ceo, orgAddress, logoURL, bannerURL, orgid, checkTimecard, checkMask, checkSymptom):
         self.orgName = orgName
         self.phoneorg = phoneorg
         self.des = des
+        self.ceo = ceo
         self.orgAddress = orgAddress
         self.logoURL = logoURL
         self.bannerURL = bannerURL
+        self.orgid = orgid
         self.checkTimecard = checkTimecard
         self.checkMask = checkMask
         self.checkSymptom = checkSymptom
         
 db.create_all()
+db.create_all(bind=['organization'])
 db.session.commit()
         
 class Time(db.Model, UserMixin):
@@ -92,6 +101,7 @@ class Time(db.Model, UserMixin):
     saturday = db.Column(db.String(5), nullable=False)
     total = db.Column(db.String(5), nullable=False)
     state = db.Column(db.String(20), nullable=False)
+    info={'bind_key':'timecard'}
     
     def __init__(self, user_id, start_week, sunday, monday, tuesday, wednesday, thursday, friday,
     saturday, total, state):
@@ -108,6 +118,7 @@ class Time(db.Model, UserMixin):
         self.state = state
 
 db.create_all()
+db.create_all(bind=['timecard'])
 db.session.commit()
 
 def get_org(_id):
@@ -119,5 +130,5 @@ def get_time(_id, start_week):
     return time
 
 if __name__ == '__main__':
-    #db.drop_all()
+    db.create_all()
     app.run(debug=True)

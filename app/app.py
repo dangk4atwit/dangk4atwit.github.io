@@ -1,7 +1,7 @@
 from audioop import add
 from enum import unique
 import this
-from cp_db import User, Org, app, db, Time, get_org, get_time
+from cp_db import User, Org, Time, app, db, get_org, get_time
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request
 # from flask_modals import Modal, render_template_modal
@@ -71,9 +71,9 @@ def getWeeks():
     if current_user != None:
         pay_interval = str(current_user.payInt)
     
-    if "weekly" in pay_interval:
+    if "weekly" in pay_interval.lower():
         week_count = 1
-        if "bi" in pay_interval:
+        if "bi" in pay_interval.lower():
             week_count += 1
     return week_count
 
@@ -197,12 +197,14 @@ class RegisterForm(FlaskForm):
     workId = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"placeholder": "Id"})
     pronouns = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Pronouns"})
     phone = StringField(validators=[InputRequired(), Length(min=10, max=15)], render_kw={"placeholder": "Phone"})
-    etype = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Employee Type"})
+    etype = StringField(validators=[InputRequired(), Length(min=5, max=50)], render_kw={"placeholder": "Employee Type"})
     pay = FloatField(validators=[InputRequired(), NumberRange(min=7.25)], render_kw={"placeholder": "Pay Rate"})
     payInt = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Pay Interval"})
     username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], 
     render_kw={"placeholder": "Password"})
+    super_id = IntegerField(validators=[NumberRange(min=10000000, max=99999999)], render_kw={"Supervisor": "Id"})
+    orga_id = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"Organization": "Id"})
     profileImgUrl = StringField(validators=[Length(max=120)], render_kw={"placeholder": "Profile Image URL"})
     
     confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
@@ -242,8 +244,8 @@ def register():
         new_user = User(fname=form.fname.data, lname=form.lname.data, email=form.email.data,
                         username=form.username.data, password=hashed_password, workId=form.workId.data,
                         pronouns=form.pronouns.data, phone=form.phone.data, etype=form.etype.data,
-                        pay=int(round(form.pay.data, 2)*100), payInt=form.payInt.data, pImgURL=form.profileImgUrl.data,
-                        super_id=form.super_id.data, orga_id=form.orga_id.data)
+                        pay=int(round(form.pay.data, 2)*100), payInt=form.payInt.data, 
+                        super_id=form.super_id.data, orga_id=form.orga_id.data, pImgURL=form.profileImgUrl.data)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -255,10 +257,12 @@ def register():
 class OrgRegisterForm(FlaskForm):
     orgName = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Organization Name"})
     phoneorg = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Phone Number"})
-    des = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "Description"})
-    orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Organization Address"})
-    logoURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
-    bannerURL = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
+    des = StringField(validators=[InputRequired(), Length(min=5, max=200)], render_kw={"placeholder": "Description"})
+    ceo = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "CEO"})
+    orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=100)], render_kw={"placeholder": "Organization Address"})
+    orgid = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"Organization": "Id"})
+    logoURL = StringField(validators=[Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
+    bannerURL = StringField(validators=[ Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
     checkTimecard = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
     checkMask = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
     checkSymptom = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
@@ -281,9 +285,9 @@ def org_register():
     form = OrgRegisterForm()
     
     if form.validate_on_submit():
-        new_org = Org(orgName=form.orgName.data, phoneorg=form.phoneorg.data, des=form.des.data, orgAddress=form.orgAddress.data,
-                    logoURL=form.logoURL.data, bannerURL=form.bannerURL.data, checkTimecard=form.checkTimecard.data, checkMask=form.checkMask.data, 
-                    checkSymptom=form.checkSymptom.data)
+        new_org = Org(orgName=form.orgName.data, phoneorg=form.phoneorg.data, des=form.des.data, ceo=form.ceo.data, orgAddress=form.orgAddress.data, 
+        orgid = form.orgid.data, logoURL=form.logoURL.data, bannerURL=form.bannerURL.data, checkTimecard=form.checkTimecard.data, checkMask=form.checkMask.data, 
+        checkSymptom=form.checkSymptom.data)
         db.session.add(new_org)
         db.session.commit()
         return redirect(url_for('login'))
@@ -533,7 +537,6 @@ def home():
 
 
 
-
-
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)
