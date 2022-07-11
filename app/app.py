@@ -149,6 +149,28 @@ def setTimecardHour(hours):
     global curr_timecard_index
 
     curr_timecard_hours[curr_timecard_index] = hours
+    
+def addTimecardHour(hour):
+    global curr_timecard_hours
+    global curr_timecard_index
+    if curr_timecard_hours[curr_timecard_index] == "0":
+        setTimecardHour(hour)
+        return
+    if hour == "0":
+        return
+    current_time = curr_timecard_hours[curr_timecard_index].split(":")
+    current_hour = hour.split(":")
+    total_minute = int(current_time[1]) + int(current_hour[1])
+    total_hour = int(current_time[0]) + int(current_hour[0]) + int(int(total_minute)/60)
+    total_minute = total_minute % 60
+    if total_hour > 24:
+        setTimecardHour("24:00")
+    else:
+        if total_minute < 10:
+            total_hours = ":".join([str(total_hour), "0" + str(total_minute)])
+        else:
+            total_hours = ":".join([str(total_hour), str(total_minute)])
+        setTimecardHour(total_hours)
 
 def determineBiweeklyStart():
     sun = getLastSunday()
@@ -222,13 +244,6 @@ def clock_out(sunday):
         db.session.commit()
     inTime = datetime.strptime(c.clock_in, '%m/%d/%Y|%H:%M')
     inTime = inTime.astimezone(LOCAL_TIMEZONE)
-    print("In: " + str(inTime))
-    print("In Hours: " + str(inTime.hour))
-    print("In Minutes: " + str(inTime.minute))
-    
-    print("S: " + str(sunday))
-    print("S Hours: " + str(sunday.hour))
-    print("S Minutes: " + str(sunday.minute))
     now = datetime.now(LOCAL_TIMEZONE)
     
     if "bi" in current_user.payInt.lower():
@@ -250,22 +265,19 @@ def clock_out(sunday):
             if i == 0:
                 curr_timecard_index = (inTime - sunday).days
                 inputHours = seconds_to_hours_string((inTime - nextDate).total_seconds())
-                setTimecardHour(inputHours)
+                addTimecardHour(inputHours)
                 nextDate = nextDate - timedelta(days=1)
             elif i == daysDifference-1:
                 curr_timecard_index = (now - sunday).days
                 inputHours = seconds_to_hours_string((nextDate - now).total_seconds())
-                setTimecardHour(inputHours)
+                addTimecardHour(inputHours)
             else:
                 curr_timecard_index = (nextDate - sunday).days
                 setTimecardHour("24:00")
     else:
         curr_timecard_index = (inTime - sunday).days
-        print("Index: " + str(curr_timecard_index))
         inputHours = seconds_to_hours_string((now - inTime).total_seconds())
-        print("Seconds: " + str((now - inTime).total_seconds()))
-        print("Input Hours: " + inputHours)
-        setTimecardHour(inputHours)
+        addTimecardHour(inputHours)
     
     newC = Clock(current_user.workId, c.clock_in, True)
     db.session.add(newC)
@@ -439,6 +451,11 @@ class TimecardForm(FlaskForm):
     def __init__(self, amount, sunday, *args, **kwargs):
         super(TimecardForm, self).__init__(*args, **kwargs)
         self.dayVals = getListOfDayVals(amount, sunday)
+        c = get_clock_in(current_user.workId)
+        if c is not None:
+            self.lastClockIn = c.clock_in
+        else:
+            self.lastClockIn = "None"
     
 
 @app.route('/timecard', methods=['GET', 'POST'])

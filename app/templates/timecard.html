@@ -8,15 +8,16 @@
     </head>
     {% block content %}
     <div id='center' class="main center">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            {% if clocked %}
+                {{form.clockOut}}
+                <Label>Clock In Time : {{form.lastClockIn}}</label>
+            {% else %}
+                {{form.clockIn}}
+            {% endif %}
+        </form>
         <div class = "mainInner">
-            <form method="POST" action="">
-                {{ form.hidden_tag() }}
-                {% if clocked %}
-                    {{form.clockOut}}
-                {% else %}
-                    {{form.clockIn}}
-                {% endif %}
-            </form>
             <div class="tableContainer">
                 {% if weeks > 0 %}
                     <table>

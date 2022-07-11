@@ -43,6 +43,11 @@
     border-color: var(--vanta_black);
 }
 
+label {
+    color: var(--white);
+    font-weight: bold;
+}
+
 th {
     color: var(--white);
     background-color: var(--vanta_black);
