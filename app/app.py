@@ -471,7 +471,7 @@ def timecard():
     
     if curr_timecard_hours == []:
         getTimecardHours(startDate, form.dayVals)
-    
+    total = calculateTotalHours()
     if form.validate_on_submit():
         if form.saveDraft.data:
             print("Saving Draft")
@@ -488,7 +488,7 @@ def timecard():
         curr_timecard_hours = []
         return redirect(url_for('timecard'))
     adaptAdmin()
-    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours)
+    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
 
 
 
