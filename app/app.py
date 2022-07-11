@@ -1,10 +1,8 @@
 from audioop import add
 from enum import unique
-import this
 from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request
-# from flask_modals import Modal, render_template_modal
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from flask_navigation import Navigation
@@ -13,7 +11,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
 from flask_bcrypt import Bcrypt
 import phonenumbers
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 
 nav = Navigation(app)   
 bcrypt = Bcrypt(app)
@@ -25,6 +23,8 @@ login_manager.login_view = "login"
 
 curr_timecard_index = -1
 curr_timecard_hours = []
+
+LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
 nav.Bar('top', [
     nav.Item('Dashboard', 'dashboard'),
@@ -87,9 +87,10 @@ def getWeeks():
     return week_count
 
 def getLastSunday():
-    today = date.today()
+    today = datetime.now(LOCAL_TIMEZONE)
     idx = (today.weekday() + 1) % 7
     sun = today - timedelta(idx)
+    sun = sun.replace(hour=0, minute=0, second=0, microsecond=1)
     return sun
 
 def getSundayBefore():
@@ -111,22 +112,22 @@ def getListOfDayDates(days, sunday):
 
 def getTimecardHours(startDate, timecardDays):
     
-    time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+    time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
     
     if time == None:
         generateEmptyTimecard(startDate)
-        time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+        time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
     fillCurrTime(time, True)
     if len(timecardDays) > 7:
         nextDate = startDate + timedelta(days=7)
-        nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+        nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
         if nextTime == None:
             generateEmptyTimecard(nextDate)
-            nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+            nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
         fillCurrTime(nextTime, False) 
 
 def generateEmptyTimecard(startDate):
-    newTime = Time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]), "0", "0", "0", "0", "0", "0", "0", "0", "none")
+    newTime = Time(current_user.workId, startDate.strftime('%m/%d/%Y'), "0", "0", "0", "0", "0", "0", "0", "0", "none")
     db.session.add(newTime)
     db.session.commit()
     
@@ -151,7 +152,7 @@ def setTimecardHour(hours):
 
 def determineBiweeklyStart():
     sun = getLastSunday()
-    referenceDate = date(2017, 1, 1)
+    referenceDate = datetime(2017, 1, 1, hour=0,minute=0,second=0,microsecond=1,tzinfo=LOCAL_TIMEZONE)
     currentHalf = ((referenceDate - sun).days/7)%2
     if currentHalf == 0:
         return sun
@@ -175,26 +176,109 @@ def saveTimecard(startDate, status):
     global curr_timecard_hours
     if curr_timecard_hours == []:
         return
-    time = get_time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]))
+    time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
     db.session.delete(time)
     db.session.commit()
-    newTime = Time(current_user.workId, "/".join([str(startDate.month), str(startDate.day), str(startDate.year)]), curr_timecard_hours[0], 
+    newTime = Time(current_user.workId, startDate.strftime('%m/%d/%Y'), curr_timecard_hours[0], 
     curr_timecard_hours[1], curr_timecard_hours[2], curr_timecard_hours[3], curr_timecard_hours[4], curr_timecard_hours[5], 
     curr_timecard_hours[6], calculateTotalHours(), status)
     db.session.add(newTime)
     db.session.commit()
     if len(curr_timecard_hours) > 7:
         nextDate = startDate + timedelta(days=7)
-        nextTime = get_time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]))
+        nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
         db.session.delete(nextTime)
         db.session.commit()
-        nextNewTime = Time(current_user.workId, "/".join([str(nextDate.month), str(nextDate.day), str(nextDate.year)]), curr_timecard_hours[7], 
+        nextNewTime = Time(current_user.workId, nextDate.strftime('%m/%d/%Y'), curr_timecard_hours[7], 
         curr_timecard_hours[8], curr_timecard_hours[9], curr_timecard_hours[10], curr_timecard_hours[11], curr_timecard_hours[12], 
         curr_timecard_hours[13], calculateTotalHours(), status)
         db.session.add(nextNewTime)
         db.session.commit()
 
+def clock_in():
+    c = get_clock_in(current_user.workId)
+    if c is not None:
+        db.session.delete(c)
+        db.session.commit()
+    now = datetime.now(LOCAL_TIMEZONE)
+    newC = Clock(current_user.workId, now.strftime('%m/%d/%Y|%H:%M'), False)
+    db.session.add(newC)
+    db.session.commit()
 
+def seconds_to_hours_string(seconds):
+    hours = int(seconds/(3600))
+    minutes = int((seconds - (hours*3600))/60)
+    if hours == 0 and minutes == 0:
+        return "0"
+    if minutes < 10:
+        return ":".join([str(hours), "0" + str(minutes)])
+    else:
+        return ":".join([str(hours), str(minutes)])
+
+def clock_out(sunday):
+    c = get_clock_in(current_user.workId)
+    if c is not None:
+        db.session.delete(c)
+        db.session.commit()
+    inTime = datetime.strptime(c.clock_in, '%m/%d/%Y|%H:%M')
+    inTime = inTime.astimezone(LOCAL_TIMEZONE)
+    print("In: " + str(inTime))
+    print("In Hours: " + str(inTime.hour))
+    print("In Minutes: " + str(inTime.minute))
+    
+    print("S: " + str(sunday))
+    print("S Hours: " + str(sunday.hour))
+    print("S Minutes: " + str(sunday.minute))
+    now = datetime.now(LOCAL_TIMEZONE)
+    
+    if "bi" in current_user.payInt.lower():
+        if (sunday - now).days > 14:
+            return
+    else:
+        if (sunday - now).days > 7:
+            return
+    
+    if sunday > inTime:
+        return
+    
+    global curr_timecard_index
+    nextDate = inTime
+    daysDifference = (inTime - now).days
+    if daysDifference > 0:
+        for i in range(daysDifference + 1):
+            nextDate = nextDate + timedelta(days=1)
+            if i == 0:
+                curr_timecard_index = (inTime - sunday).days
+                inputHours = seconds_to_hours_string((inTime - nextDate).total_seconds())
+                setTimecardHour(inputHours)
+                nextDate = nextDate - timedelta(days=1)
+            elif i == daysDifference-1:
+                curr_timecard_index = (now - sunday).days
+                inputHours = seconds_to_hours_string((nextDate - now).total_seconds())
+                setTimecardHour(inputHours)
+            else:
+                curr_timecard_index = (nextDate - sunday).days
+                setTimecardHour("24:00")
+    else:
+        curr_timecard_index = (inTime - sunday).days
+        print("Index: " + str(curr_timecard_index))
+        inputHours = seconds_to_hours_string((now - inTime).total_seconds())
+        print("Seconds: " + str((now - inTime).total_seconds()))
+        print("Input Hours: " + inputHours)
+        setTimecardHour(inputHours)
+    
+    newC = Clock(current_user.workId, c.clock_in, True)
+    db.session.add(newC)
+    db.session.commit()
+    
+def isClockedIn():
+    c = get_clock_in(current_user.workId)
+    if c == None:
+        return False
+    elif c.clocked_out:
+        return False
+    return True
+        
 ####################################################            FORMS & PAGES              #################################################################################
 
 
@@ -348,6 +432,8 @@ def dashboard():
 
 
 class TimecardForm(FlaskForm):
+    clockIn = SubmitField("Clock In")
+    clockOut = SubmitField("Clock Out")
     saveDraft = SubmitField("Save Draft")
     submit = SubmitField("Submit Timecard")
     def __init__(self, amount, sunday, *args, **kwargs):
@@ -359,7 +445,6 @@ class TimecardForm(FlaskForm):
 @login_required
 def timecard():
     global curr_timecard_hours
-    
     if "bi" in current_user.payInt.lower():
         startDate = determineBiweeklyStart()
         form = TimecardForm(amount=getWeeks()*7, sunday=startDate)
@@ -374,15 +459,19 @@ def timecard():
         if form.saveDraft.data:
             print("Saving Draft")
             saveTimecard(startDate, "none")
-
+        elif form.clockIn.data:
+            clock_in()
+        elif form.clockOut.data:
+            clock_out(startDate)
+            saveTimecard(startDate, "none")
         else:
             print("Submitting")
             saveTimecard(startDate, "submitted")
             
         curr_timecard_hours = []
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('timecard'))
     adaptAdmin()
-    return render_template('timecard.html', form=form, weeks = getWeeks(), today=date.today().day, curr_timecard_hours=curr_timecard_hours)
+    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours)
 
 
 
@@ -466,11 +555,13 @@ def timecard_modal():
                 h = ":".join([h,"00"])
                 
         #Put hours into database
+        if h == "0:00":
+            h = "0"
         setTimecardHour(h)
         curr_timecard_index = -1
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=date.today().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
+    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 
 
