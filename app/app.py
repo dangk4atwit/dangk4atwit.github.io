@@ -11,11 +11,10 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
 from flask_bcrypt import Bcrypt
 import phonenumbers
-from datetime import datetime, timedelta, date, timezone
+from datetime import datetime, timedelta, timezone
 
 nav = Navigation(app)   
 bcrypt = Bcrypt(app)
-# modal = Modal(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
