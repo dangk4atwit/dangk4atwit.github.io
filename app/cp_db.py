@@ -57,21 +57,25 @@ db.session.commit()
 class Org(db.Model, UserMixin):
     __bind_key__ = 'organization'
     id = db.Column(db.Integer, primary_key=True)
+    orgUname = db.Column(db.String(80), nullable=False)
+    orgPass = db.Column(db.String(80), nullable=False)
     orgName = db.Column(db.String(80), nullable=False)
     orgid = db.Column(db.Integer, nullable=False)
     ceo = db.Column(db.String(80), nullable=False)
     phoneorg = db.Column(db.String(80), nullable=False)
     des = db.Column(db.String(200), nullable=False, unique=True)
     orgAddress = db.Column(db.String(20), nullable=False, unique=True) 
-    logoURL = db.Column(db.String(120), nullable=False)
-    bannerURL = db.Column(db.String(120), nullable=False)
+    logoURL = db.Column(db.String(120), nullable=True)
+    bannerURL = db.Column(db.String(120), nullable=True)
     checkTimecard = db.Column(db.Boolean, nullable=False)
     checkMask = db.Column(db.Boolean, nullable=False)
     checkSymptom = db.Column(db.Boolean, nullable=False)
     info={'bind_key':'organization'}
     
 
-    def __init__(self, orgName, phoneorg, des, ceo, orgAddress, logoURL, bannerURL, orgid, checkTimecard, checkMask, checkSymptom):
+    def __init__(self, orgUname, orgPass, orgName, phoneorg, des, ceo, orgAddress, logoURL, bannerURL, orgid, checkTimecard, checkMask, checkSymptom):
+        self.orgUname = orgUname
+        self.orgPass = orgPass
         self.orgName = orgName
         self.phoneorg = phoneorg
         self.des = des

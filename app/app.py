@@ -2,7 +2,7 @@ from audioop import add
 from enum import unique
 from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in
 import bcrypt
-from flask import render_template, url_for, redirect, abort, flash, request
+from flask import render_template, url_for, redirect, abort, flash, request, session
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from flask_navigation import Navigation
@@ -36,7 +36,7 @@ nav.Bar('top', [
 def load_user(user_id):
     user = User.query.get(int(user_id))
     if user is None:
-        flash('You have been automatically logged ut')
+        flash('You have been automatically logged out')
     return user
 
 def isAdmin():
@@ -339,7 +339,43 @@ class RegisterForm(FlaskForm):
             print(e)
             raise ValidationError('Invalid phone number')
 
+
+
+
+
+class OrgRegisterForm(FlaskForm):
+    orgUname = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Organization Username"})
+    orgPass = PasswordField(validators=[InputRequired(), Length(min=4, max=25), EqualTo('confirm', message='Passwords must match')], 
+    render_kw={"placeholder": "Organization Password"})
+    orgName = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Organization Name"})
+    phoneorg = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Phone Number"})
+    des = StringField(validators=[InputRequired(), Length(min=5, max=200)], render_kw={"placeholder": "Description"})
+    ceo = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "CEO"})
+    orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=100)], render_kw={"placeholder": "Organization Address"})
+    orgid = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"Organization": "Id"})
+    logoURL = StringField(validators=[Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
+    bannerURL = StringField(validators=[ Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
+    checkTimecard = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+    checkMask = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+    checkSymptom = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+
+    confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
+    submit = SubmitField("Register")
+
+    def validate_phone(self, phoneorg):
+        try:
+            p = phonenumbers.parse(phoneorg.data, None)
+            if not phonenumbers.is_valid_number(p):
+                print("Phone Number valid number")
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError) as e:
+            print(phoneorg.data)
+            print("Phone Number format")
+            print(e)
+            raise ValidationError('Invalid phone number')
+
 @app.route('/register', methods=['GET', 'POST'])
+            
 def register():
     form = RegisterForm()
     
@@ -356,42 +392,16 @@ def register():
     
     return render_template('register.html', form=form)
 
-
-
-class OrgRegisterForm(FlaskForm):
-    orgName = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Organization Name"})
-    phoneorg = StringField(validators=[InputRequired(), Length(min=2, max=25)], render_kw={"placeholder": "Phone Number"})
-    des = StringField(validators=[InputRequired(), Length(min=5, max=200)], render_kw={"placeholder": "Description"})
-    ceo = StringField(validators=[InputRequired(), Length(min=5, max=25)], render_kw={"placeholder": "CEO"})
-    orgAddress = StringField(validators=[InputRequired(), Length(min=4, max=100)], render_kw={"placeholder": "Organization Address"})
-    orgid = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"Organization": "Id"})
-    logoURL = StringField(validators=[Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
-    bannerURL = StringField(validators=[ Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
-    checkTimecard = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
-    checkMask = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
-    checkSymptom = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
-    submit = SubmitField("Register")
-
-    def validate_phone(self, phoneorg):
-        try:
-            p = phonenumbers.parse(phoneorg.data, None)
-            if not phonenumbers.is_valid_number(p):
-                print("Phone Number valid number")
-                raise ValueError()
-        except (phonenumbers.phonenumberutil.NumberParseException, ValueError) as e:
-            print(phoneorg.data)
-            print("Phone Number format")
-            print(e)
-            raise ValidationError('Invalid phone number')
-
 @app.route('/org_register', methods=['GET', 'POST'])
 def org_register():
     form = OrgRegisterForm()
     
     if form.validate_on_submit():
-        new_org = Org(orgName=form.orgName.data, phoneorg=form.phoneorg.data, des=form.des.data, ceo=form.ceo.data, orgAddress=form.orgAddress.data, 
-        orgid = form.orgid.data, logoURL=form.logoURL.data, bannerURL=form.bannerURL.data, checkTimecard=form.checkTimecard.data, checkMask=form.checkMask.data, 
-        checkSymptom=form.checkSymptom.data)
+        hashed_orgpassword = bcrypt.generate_password_hash(form.orgPass.data)
+        new_org = Org(orgUname=form.orgUname.data, orgPass= hashed_orgpassword, orgName=form.orgName.data, 
+                    phoneorg=form.phoneorg.data, des=form.des.data, ceo=form.ceo.data, orgAddress=form.orgAddress.data, 
+                    orgid = form.orgid.data, logoURL=form.logoURL.data, bannerURL=form.bannerURL.data, checkTimecard=form.checkTimecard.data, 
+                    checkMask=form.checkMask.data, checkSymptom=form.checkSymptom.data)
         db.session.add(new_org)
         db.session.commit()
         return redirect(url_for('login'))
@@ -399,21 +409,15 @@ def org_register():
     return render_template('register_org.html', form=form)
 
 
-class OrgLoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
-    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Password"})
-    remember = BooleanField(false_values=(False, 'false', 0, '0'))
-    submit = SubmitField("Login")
-
 @app.route('/org_login', methods=['GET', 'POST'])
-def login():
-    form = OrgLoginForm()
+def org_login():
+    form = LoginForm()
     
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user, remember=form.remember.data)
+        orgUser = Org.query.filter_by(orgUname=form.username.data).first()
+        if orgUser:
+            if bcrypt.check_password_hash(orgUser.orgPass, form.password.data):
+                login_user(orgUser, remember=form.remember.data)
                 return redirect(url_for('dashboard'))
             else:
                 flash('Incorrect Username or Password', 'danger')
