@@ -399,6 +399,29 @@ def org_register():
     return render_template('register_org.html', form=form)
 
 
+class OrgLoginForm(FlaskForm):
+    username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
+    password = PasswordField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Password"})
+    remember = BooleanField(false_values=(False, 'false', 0, '0'))
+    submit = SubmitField("Login")
+
+@app.route('/org_login', methods=['GET', 'POST'])
+def login():
+    form = OrgLoginForm()
+    
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            if bcrypt.check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember.data)
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Incorrect Username or Password', 'danger')
+        else:
+            flash('Incorrect Username or Password', 'danger')
+            
+    return render_template('org_login.html', form=form)
+
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=25)], render_kw={"placeholder": "Username"})
