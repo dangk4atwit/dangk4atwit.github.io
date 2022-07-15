@@ -41,7 +41,7 @@
                     </table>
                 {% endif %}
             </div>
-            <div class="blur"></div>
+            <a href="{{url_for('timecard')}}"><div class="blur"></div></a>
             <div class=" modal">
                 <form method="POST">
                     {{ form.hidden_tag() }}
