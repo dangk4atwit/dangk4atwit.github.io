@@ -20,9 +20,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-curr_timecard_index = -1
-curr_timecard_hours = []
-
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
 nav.Bar('top', [
@@ -132,8 +129,8 @@ def generateEmptyTimecard(startDate):
     
 
 def fillCurrTime(time, reset):
-    global curr_timecard_hours
-    if reset:
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if reset or curr_timecard_hours == None:
         curr_timecard_hours = []
     curr_timecard_hours.append(time.sunday)
     curr_timecard_hours.append(time.monday)
@@ -142,16 +139,23 @@ def fillCurrTime(time, reset):
     curr_timecard_hours.append(time.thursday)
     curr_timecard_hours.append(time.friday)
     curr_timecard_hours.append(time.saturday)
+    
+    session["curr_timecard_hours"] = curr_timecard_hours
 
 def setTimecardHour(hours):
-    global curr_timecard_hours
-    global curr_timecard_index
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    curr_timecard_index = session.get("curr_timecard_index", None)
 
+    if curr_timecard_hours == None or curr_timecard_index == None:
+        return
     curr_timecard_hours[curr_timecard_index] = hours
+    session["curr_timecard_hours"] = curr_timecard_hours
     
 def addTimecardHour(hour):
-    global curr_timecard_hours
-    global curr_timecard_index
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    curr_timecard_index = session.get("curr_timecard_index", None)
+    if curr_timecard_hours == None or curr_timecard_index == None:
+        return
     if curr_timecard_hours[curr_timecard_index] == "0":
         setTimecardHour(hour)
         return
@@ -180,7 +184,9 @@ def determineBiweeklyStart():
     return getSundayBefore()
 
 def calculateTotalHours():
-    global curr_timecard_hours
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        return "0"
     totalHours = 0
     totalMinutes = 0
     for t in curr_timecard_hours:
@@ -194,7 +200,9 @@ def calculateTotalHours():
         
 
 def saveTimecard(startDate, status):
-    global curr_timecard_hours
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        return
     if curr_timecard_hours == []:
         return
     time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
@@ -254,30 +262,29 @@ def clock_out(sunday):
     
     if sunday > inTime:
         return
-    
-    global curr_timecard_index
+
     nextDate = inTime
     daysDifference = (inTime - now).days
     if daysDifference > 0:
         for i in range(daysDifference + 1):
             nextDate = nextDate + timedelta(days=1)
             if i == 0:
-                curr_timecard_index = (inTime - sunday).days
+                session["curr_timecard_index"] = (inTime - sunday).days
                 inputHours = seconds_to_hours_string((inTime - nextDate).total_seconds())
                 addTimecardHour(inputHours)
                 nextDate = nextDate - timedelta(days=1)
             elif i == daysDifference-1:
-                curr_timecard_index = (now - sunday).days
+                session["curr_timecard_index"] = (now - sunday).days
                 inputHours = seconds_to_hours_string((nextDate - now).total_seconds())
                 addTimecardHour(inputHours)
             else:
-                curr_timecard_index = (nextDate - sunday).days
+                session["curr_timecard_index"] = (nextDate - sunday).days
                 setTimecardHour("24:00")
     else:
-        curr_timecard_index = (inTime - sunday).days
+        session["curr_timecard_index"] = (inTime - sunday).days
         inputHours = seconds_to_hours_string((now - inTime).total_seconds())
         addTimecardHour(inputHours)
-    
+    session.pop("curr_timecard_index")
     newC = Clock(current_user.workId, c.clock_in, True)
     db.session.add(newC)
     db.session.commit()
@@ -487,7 +494,6 @@ class TimecardForm(FlaskForm):
 @app.route('/timecard', methods=['GET', 'POST'])
 @login_required
 def timecard():
-    global curr_timecard_hours
     if "bi" in current_user.payInt.lower():
         startDate = determineBiweeklyStart()
         form = TimecardForm(amount=getWeeks()*7, sunday=startDate)
@@ -495,9 +501,16 @@ def timecard():
         startDate = getLastSunday()
         form = TimecardForm(amount=getWeeks()*7, sunday=getLastSunday())
     
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        getTimecardHours(startDate, form.dayVals)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == []:
         getTimecardHours(startDate, form.dayVals)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
+    
     total = calculateTotalHours()
+    
     if form.validate_on_submit():
         if form.saveDraft.data:
             print("Saving Draft")
@@ -511,7 +524,7 @@ def timecard():
             print("Submitting")
             saveTimecard(startDate, "submitted")
             
-        curr_timecard_hours = []
+        session.pop("curr_timecard_hours")
         return redirect(url_for('timecard'))
     adaptAdmin()
     return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
@@ -525,8 +538,7 @@ def timecard():
 def loadModal():
     if request.method == "POST":
         id = request.form["id"]
-        global curr_timecard_index
-        curr_timecard_index = int(id)
+        session["curr_timecard_index"] = int(id)
         return redirect(url_for("timecard_modal"))
 
 
@@ -576,7 +588,9 @@ class Timecard_ModalForm(FlaskForm):
 @app.route('/timecard_modal', methods=['GET', 'POST'])
 @login_required
 def timecard_modal():
-    global curr_timecard_index
+    curr_timecard_index = session.get("curr_timecard_index", None)
+    if curr_timecard_index == None:
+        return redirect(url_for('timecard'))
     if curr_timecard_index == -1:
         return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
@@ -585,7 +599,9 @@ def timecard_modal():
         dayVals = getListOfDayVals(getWeeks()*7, determineBiweeklyStart())
     else:
         dayVals = getListOfDayVals(getWeeks()*7, getLastSunday())
-    global curr_timecard_hours
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        return redirect(url_for('timecard'))
     if form.validate_on_submit():
         h = str(form.hours.data)
         if ":" not in h:
@@ -601,7 +617,7 @@ def timecard_modal():
         if h == "0:00":
             h = "0"
         setTimecardHour(h)
-        curr_timecard_index = -1
+        session.pop("curr_timecard_index")
         return redirect(url_for('timecard'))
         
     return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
