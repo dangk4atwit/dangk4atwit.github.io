@@ -23,7 +23,7 @@
   </label>
   <div id="sidebarMenu">
     <ul class="sidebarMenuInner">
-      <li>{{form.firstName}} {{form.lastName}}<span>{{form.title}}</span></li>
+      <li>{{current_user.fname}} {{current_user.lname}}<span>{{current_user.etype}}</span></li>
       {% for item in nav.top %}
         <li>
           <a href="{{ item.url }}">{{item.label}}</a>
