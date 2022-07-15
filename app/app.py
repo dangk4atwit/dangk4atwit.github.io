@@ -50,24 +50,22 @@ def get_super_name():
         return ""
     return " ".join([s.fname,s.lname])
 
-
-def adaptRegular():
-    nav.Bar('top', [
-    nav.Item('Dashboard', 'dashboard'),
-    nav.Item('Profile', 'profile'),
-    nav.Item('Timecard', 'timecard'),
-    nav.Item('Verify', 'verify'),])
-
-def adaptAdmin():
+def adaptNav():
+    navItems = []
+    navItems.append(nav.Item('Dashboard', 'dashboard'))
+    navItems.append(nav.Item('Profile', 'profile'))
+    org = get_org(current_user.orga_id)
+    if org == None:
+        return
+    if org.checkTimecard:
+        navItems.append(nav.Item('Timecard', 'timecard'))
+    if org.checkSymptom:
+       navItems.append(nav.Item('Verify', 'verify'))
+    if org.checkMask:
+        navItems.append(nav.Item('Verify', 'verify'))
     if isAdmin():
-        nav.Bar('top', [
-            nav.Item('Dashboard', 'dashboard'),
-            nav.Item('Profile', 'profile'),
-            nav.Item('Timecard', 'timecard'),
-            nav.Item('Verify', 'verify'),
-            nav.Item('Management', 'management'),])
-    else:
-        adaptRegular()
+        navItems.append(nav.Item('Management', 'management'))
+    nav.Bar('top', navItems)
 
 
 def getWeeks():
@@ -470,7 +468,7 @@ class DashboardForm(FlaskForm):
 @login_required
 def dashboard():
     form = DashboardForm()
-    adaptAdmin()
+    adaptNav()
     return render_template('dashboard.html', form=form)
 
 
@@ -526,7 +524,7 @@ def timecard():
             
         session.pop("curr_timecard_hours")
         return redirect(url_for('timecard'))
-    adaptAdmin()
+    adaptNav()
     return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
 
 
@@ -594,7 +592,7 @@ def timecard_modal():
     if curr_timecard_index == -1:
         return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
-    adaptAdmin()
+    adaptNav()
     if "bi" in current_user.payInt.lower():
         dayVals = getListOfDayVals(getWeeks()*7, determineBiweeklyStart())
     else:
@@ -635,7 +633,7 @@ class VerifyForm(FlaskForm):
 @login_required
 def verify():
     form = VerifyForm()
-    adaptAdmin()
+    adaptNav()
     return render_template('verify.html', form=form)
 
 
@@ -654,7 +652,7 @@ class ProfileForm(FlaskForm):
 def profile():
     form = ProfileForm()
     curr_org = get_org(1)
-    adaptAdmin()
+    adaptNav()
 
     return render_template('profile.html', form=form, curr_org=curr_org)    
 
@@ -670,7 +668,7 @@ class ManagementForm(FlaskForm):
 @login_required
 def management():
     form = ManagementForm()
-    adaptAdmin()
+    adaptNav()
     return render_template('management.html', form=form)
 
 
