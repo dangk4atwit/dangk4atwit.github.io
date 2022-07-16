@@ -62,7 +62,8 @@ def get_super_name():
 def adaptNav():
     navItems = []
     navItems.append(nav.Item('Dashboard', 'dashboard'))
-    if session.get("uType", "") == "user":
+    uType = session.get("uType", "")
+    if uType == "user":
         navItems.append(nav.Item('Profile', 'profile'))
         org = get_org(current_user.orga_id)
         if org == None:
@@ -72,12 +73,14 @@ def adaptNav():
         if org.checkSymptom or org.checkMask:
             subItems = []
             if org.checkSymptom:
-                subItems.append(nav.Item('Symptom Check', 'verify'))
+                subItems.append(nav.Item('Symptom Check', 'symptom_check'))
             if org.checkMask:
-                subItems.append(nav.Item('Mask Check', 'verify'))
-            navItems.append(nav.Item('Verify', 'verify', items=subItems))
+                subItems.append(nav.Item('Mask Verify', 'mask_verify'))
+            navItems.append(nav.Item('Verify', '', items=subItems))
         if isAdmin():
             navItems.append(nav.Item('Management', 'management'))
+    elif uType == "org":
+        navItems.append(nav.Item('Management', 'org_management'))
     nav.Bar('top', navItems)
 
 
@@ -638,18 +641,25 @@ def timecard_modal():
 
 
 
-class VerifyForm(FlaskForm):
-    firstName = "Test"
-    lastName = "Name"
-    title = "Test Title"
-    isAdmin = False
+class MaskVerifyForm(FlaskForm):
+    pass
     
-@app.route('/verify', methods=['GET', 'POST'])
+@app.route('/mask_verify', methods=['GET', 'POST'])
 @login_required
-def verify():
-    form = VerifyForm()
+def mask_verify():
+    form = MaskVerifyForm()
     adaptNav()
-    return render_template('verify.html', form=form)
+    return render_template('mask_verify.html', form=form)
+
+class SymptomCheckForm(FlaskForm):
+    pass
+    
+@app.route('/symptom_check', methods=['GET', 'POST'])
+@login_required
+def symptom_check():
+    form = SymptomCheckForm()
+    adaptNav()
+    return render_template('symptom_check.html', form=form)
 
 
     
@@ -674,10 +684,7 @@ def profile():
     
     
 class ManagementForm(FlaskForm):
-    firstName = "Admin"
-    lastName = "Admin"
-    title = "Administrator"
-    isAdmin = False
+    pass
 
 @app.route('/management', methods=['GET', 'POST'])
 @login_required
@@ -687,7 +694,15 @@ def management():
     return render_template('management.html', form=form)
 
 
+class OrgManagementForm(FlaskForm):
+    pass
 
+@app.route('/org_management', methods=['GET', 'POST'])
+@login_required
+def org_management():
+    form = OrgManagementForm()
+    adaptNav()
+    return render_template('org_management.html', form=form)
 
 
 

@@ -1,9 +1,9 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{current_user.fname}}'s Management{% endblock %}  
+        {% block title %}{{current_user.orgName}}'s Management{% endblock %}  
         {% block stylesheet %}
-          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/management.css') }}">
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/org_management.css') }}">
         {% endblock stylesheet %}
     </head>
     {% block content %}

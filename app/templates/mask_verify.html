@@ -1,15 +1,15 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{current_user.fname}}'s Management{% endblock %}  
+        {% block title %}{{current_user.fname}}'s Mask Verification{% endblock %}  
         {% block stylesheet %}
-          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/management.css') }}">
+          <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/mask_verify.css') }}">
         {% endblock stylesheet %}
     </head>
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Management Content</div>
+        <div>Mask Verify Content</div>
       </div>
     </div>
     {% endblock %}
