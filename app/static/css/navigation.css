@@ -37,7 +37,9 @@ img[name="logo"]{
     box-shadow: none;
     background-color: var(--vanta_black);
     position: fixed;
-    height: 60px!important;
+    min-height: 60px;
+    max-height: 120px;
+    height: fit-content;
     overflow: hidden;
     z-index: 10;
     vertical-align: middle;
@@ -49,14 +51,78 @@ img[name="logo"]{
 /* Add a black background color to the top navigation */
 .topnav {
     background-color: var(--vanta_black);
-    overflow: hidden;
-    height: 60px!important;
+    height: 60px;
 }
-  
-/* Style the links inside the navigation bar */
-.topnav div {
+
+/* Subnav button */
+.subnav {
     float: left;
-    height: 60px!important;
+    height: 60px;
+    text-align: center;
+    padding: 16px 16px;
+    overflow: hidden;
+}
+
+.subnav .subnavbtn {
+    color: var(--white);
+    text-align: center;
+    padding: 16px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Style the subnav content - positioned absolute */
+.subnav-content {
+    display:none;
+    position:fixed;
+    height: 60px;
+    left: 0;
+    background-color: var(--black2);
+    top: 50px;
+    width: 100%;
+    vertical-align: top;
+}
+
+/* When you move the mouse over the subnav container, open the subnav content */
+.subnav:hover .subnav-content {
+    display: block;
+    height: 50px;
+    overflow: hidden;
+}
+
+.subnav:hover {
+    background-color: var(--black2);
+}
+
+.subnav .subnav-content div{
+    float: left;
+    height: 50px;
+    text-align: center;
+    padding: 10px 10px;
+}
+
+.subnav .subnav-content div a{
+    color: var(--white);
+    text-align: center;
+    padding: 5px 5px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.subnav .subnav-content div:hover{
+    background-color: var(--black);
+}
+
+.subnav .subnav-content div.active a {
+    border-bottom: 3px solid var(--orange);
+}
+
+/* Style the links inside the navigation bar */
+.topnav div.reg {
+    float: left;
+    height: 60px;
     text-align: center;
     padding: 16px 16px;
 }
@@ -71,11 +137,7 @@ img[name="logo"]{
 }
   
 /* Change the color of links on hover */
-.topnav div:hover {
-    background-color: var(--black2);
-}
-
-.topnav div.active {
+.topnav div.reg:hover {
     background-color: var(--black2);
 }
 

@@ -22,24 +22,33 @@ login_manager.login_view = "login"
 
 LOCAL_TIMEZONE = datetime.now(timezone.utc).astimezone().tzinfo
 
-nav.Bar('top', [
-    nav.Item('Dashboard', 'dashboard'),
-    nav.Item('Profile', 'profile'),
-    nav.Item('Timecard', 'timecard'),
-    nav.Item('Verify', 'verify'),
-])
-
 @login_manager.user_loader
-def load_user(user_id):
-    user = User.query.get(int(user_id))
-    if user is None:
+def load_user(_id):
+    uType = session.get("uType",None)
+    if uType == None:
         flash('You have been automatically logged out')
-    return user
+        return uType
+    if uType == "user":
+        user = User.query.get(int(_id))
+        if user is None:
+            flash('You have been automatically logged out')
+        return user
+    else:
+        org = Org.query.get(int(_id))
+        if org is None:
+            flash('You have been automatically logged out')
+        return org
+        
+        
 
 def isAdmin():
-    if current_user != None:
-        if str(current_user.workId)[0:2] == "69":
-            return True
+    print(session.get("uType", "") == "user")
+    if session.get("uType", "") == "user":
+        print(current_user != None)
+        if current_user != None:
+            print("69" in str(current_user.workId)[0:2])
+            if "69" in str(current_user.workId)[0:2]:
+                return True
     return False
 
 def get_super_name():
@@ -53,18 +62,22 @@ def get_super_name():
 def adaptNav():
     navItems = []
     navItems.append(nav.Item('Dashboard', 'dashboard'))
-    navItems.append(nav.Item('Profile', 'profile'))
-    org = get_org(current_user.orga_id)
-    if org == None:
-        return
-    if org.checkTimecard:
-        navItems.append(nav.Item('Timecard', 'timecard'))
-    if org.checkSymptom:
-       navItems.append(nav.Item('Verify', 'verify'))
-    if org.checkMask:
-        navItems.append(nav.Item('Verify', 'verify'))
-    if isAdmin():
-        navItems.append(nav.Item('Management', 'management'))
+    if session.get("uType", "") == "user":
+        navItems.append(nav.Item('Profile', 'profile'))
+        org = get_org(current_user.orga_id)
+        if org == None:
+            return
+        if org.checkTimecard:
+            navItems.append(nav.Item('Timecard', 'timecard'))
+        if org.checkSymptom or org.checkMask:
+            subItems = []
+            if org.checkSymptom:
+                subItems.append(nav.Item('Symptom Check', 'verify'))
+            if org.checkMask:
+                subItems.append(nav.Item('Mask Check', 'verify'))
+            navItems.append(nav.Item('Verify', 'verify', items=subItems))
+        if isAdmin():
+            navItems.append(nav.Item('Management', 'management'))
     nav.Bar('top', navItems)
 
 
@@ -422,6 +435,7 @@ def org_login():
         orgUser = Org.query.filter_by(orgUname=form.username.data).first()
         if orgUser:
             if bcrypt.check_password_hash(orgUser.orgPass, form.password.data):
+                session["uType"] = "org"
                 login_user(orgUser, remember=form.remember.data)
                 return redirect(url_for('dashboard'))
             else:
@@ -446,6 +460,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
+                session["uType"] = "user"
                 login_user(user, remember=form.remember.data)
                 return redirect(url_for('dashboard'))
             else:
@@ -680,6 +695,7 @@ def management():
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
+    session.pop("uType",None)
     logout_user()
     return redirect(url_for('login'))
 

@@ -144,7 +144,7 @@ db.create_all(bind=['clock'])
 db.session.commit()
 
 def get_org(_id):
-    org = Org.query.filter_by(id=_id).first()
+    org = Org.query.filter_by(orgid=_id).first()
     return org
 
 def get_time(_id, start_week):
