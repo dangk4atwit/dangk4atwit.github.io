@@ -40,9 +40,17 @@
     <ul class="sidebarMenuInner">
       <li>{{current_user.fname}} {{current_user.lname}}<span>{{current_user.etype}}</span></li>
       {% for item in nav.top %}
-        <li>
-          <a href="{{ item.url }}">{{item.label}}</a>
-        </li>
+        {% if item.items %}
+          {% for child in item.items %}
+            <li>
+              <a href="{{ child.url }}">{{child.label}}</a>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>
+            <a href="{{ item.url }}">{{item.label}}</a>
+          </li>
+        {% endif %}
       {% endfor %}
     </ul>
     <ul class="sidebarMenuInnerBottom">
