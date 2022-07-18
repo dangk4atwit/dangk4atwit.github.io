@@ -91,7 +91,9 @@ def adaptNav():
         if org == None:
             return
         if org.checkTimecard:
-            navItems.append(nav.Item('Timecard', 'timecard'))
+            pay_interval = str(current_user.payInt)
+            if "weekly" in pay_interval.lower():
+                navItems.append(nav.Item('Timecard', 'timecard'))
         if org.checkSymptom or org.checkMask:
             subItems = []
             if org.checkSymptom:
@@ -107,10 +109,8 @@ def adaptNav():
 
 
 def getWeeks():
-    pay_interval = ""
     week_count = 0
-    if current_user != None:
-        pay_interval = str(current_user.payInt)
+    pay_interval = str(current_user.payInt)
     
     if "weekly" in pay_interval.lower():
         week_count = 1
