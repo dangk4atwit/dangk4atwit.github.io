@@ -7,10 +7,16 @@
         {% endblock stylesheet %}
     </head>
     {% block content %}
-    <div id='center' class="main center">
-      <div class="mainInner">
-        <div>Management Content</div>
+      <div id='center' class="main center">
+        <div class="mainInner">
+          <form method="POST" action="">
+            {{ form.hidden_tag() }} 
+            <br>{{form.checkTimecard(class="setting")}} <label>Timecard</label>
+            <br>{{form.checkMask(class="setting")}} <label>Mask</label>
+            <br>{{form.checkSymptom(class="setting")}} <label>Symptom</label>
+            <br>{{form.submit}}
+          </form>
+        </div>
       </div>
-    </div>
     {% endblock %}
 </html>

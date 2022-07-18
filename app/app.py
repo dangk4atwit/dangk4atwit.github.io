@@ -1,14 +1,16 @@
 from audioop import add
 from enum import unique
-from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in
+from typing import Any
+from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in, update_time, update_org
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
+from werkzeug.datastructures import MultiDict
 from flask_navigation import Navigation
 from platformdirs import user_runtime_path
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField
-from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
+from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange, AnyOf
 from flask_bcrypt import Bcrypt
 import phonenumbers
 from datetime import datetime, timedelta, timezone
@@ -64,11 +66,8 @@ def load_user(_id):
         
 
 def isAdmin():
-    print(session.get("uType", "") == "user")
     if session.get("uType", "") == "user":
-        print(current_user != None)
         if current_user != None:
-            print("69" in str(current_user.workId)[0:2])
             if "69" in str(current_user.workId)[0:2]:
                 return True
     return False
@@ -232,6 +231,8 @@ def calculateTotalHours():
             totalMinutes += int(HM[1])
     totalHours += int(totalMinutes/60)
     totalMinutes = totalMinutes % 60
+    if totalMinutes == 0:
+        return ":".join([str(totalHours),"0" + str(totalMinutes)])
     return ":".join([str(totalHours),str(totalMinutes)])
         
 
@@ -241,24 +242,16 @@ def saveTimecard(startDate, status):
         return
     if curr_timecard_hours == []:
         return
-    time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
-    db.session.delete(time)
-    db.session.commit()
     newTime = Time(current_user.workId, startDate.strftime('%m/%d/%Y'), curr_timecard_hours[0], 
     curr_timecard_hours[1], curr_timecard_hours[2], curr_timecard_hours[3], curr_timecard_hours[4], curr_timecard_hours[5], 
     curr_timecard_hours[6], calculateTotalHours(), status)
-    db.session.add(newTime)
-    db.session.commit()
+    update_time(newTime)
     if len(curr_timecard_hours) > 7:
         nextDate = startDate + timedelta(days=7)
-        nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
-        db.session.delete(nextTime)
-        db.session.commit()
         nextNewTime = Time(current_user.workId, nextDate.strftime('%m/%d/%Y'), curr_timecard_hours[7], 
         curr_timecard_hours[8], curr_timecard_hours[9], curr_timecard_hours[10], curr_timecard_hours[11], curr_timecard_hours[12], 
         curr_timecard_hours[13], calculateTotalHours(), status)
-        db.session.add(nextNewTime)
-        db.session.commit()
+        update_time(nextNewTime)
 
 def clock_in():
     c = get_clock_in(current_user.workId)
@@ -398,9 +391,9 @@ class OrgRegisterForm(FlaskForm):
     orgid = IntegerField(validators=[InputRequired(), NumberRange(min=10000000, max=99999999)], render_kw={"Organization": "Id"})
     logoURL = StringField(validators=[Length(min=4, max=25)], render_kw={"placeholder": "Logo URL"})
     bannerURL = StringField(validators=[ Length(min=4, max=25)], render_kw={"placeholder": "Banner URL"})
-    checkTimecard = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
-    checkMask = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
-    checkSymptom = BooleanField(validators=[InputRequired()], false_values=(False, 'false', 0, '0'))
+    checkTimecard = BooleanField(false_values=(False, 'false', 0, '0'))
+    checkMask = BooleanField(false_values=(False, 'false', 0, '0'))
+    checkSymptom = BooleanField(false_values=(False, 'false', 0, '0'))
 
     confirm = PasswordField(render_kw={"placeholder": "Repeat Password"})
     submit = SubmitField("Register")
@@ -551,7 +544,6 @@ def timecard():
     
     if form.validate_on_submit():
         if form.saveDraft.data:
-            print("Saving Draft")
             saveTimecard(startDate, "none")
         elif form.clockIn.data:
             clock_in()
@@ -559,7 +551,6 @@ def timecard():
             clock_out(startDate)
             saveTimecard(startDate, "none")
         else:
-            print("Submitting")
             saveTimecard(startDate, "submitted")
             
         session.pop("curr_timecard_hours")
@@ -643,12 +634,9 @@ def timecard_modal():
     if form.validate_on_submit():
         h = str(form.hours.data)
         if ":" not in h:
-            print("inputing : inbetween")
             if len(h) > 2:
-                print("inputing : inbetween")
                 h = ":".join([h[: len(h)-2],h [len(h)-2:]])
             else:
-                print("extending with : ")
                 h = ":".join([h,"00"])
                 
         #Put hours into database
@@ -722,12 +710,28 @@ def management():
 
 
 class OrgManagementForm(FlaskForm):
-    pass
+    checkTimecard = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
+    checkMask = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
+    checkSymptom = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
+    submit = SubmitField("Save Settings")
 
 @app.route('/org_management', methods=['GET', 'POST'])
 @login_required
 def org_management():
-    form = OrgManagementForm()
+    curr_org = get_org(current_user.orgid)
+    if curr_org == None:
+        form = OrgManagementForm()
+    else:
+        form = OrgManagementForm(formdata=MultiDict({'checkTimecard': curr_org.checkTimecard, 'checkMask':curr_org.checkMask, 'checkSymptom': curr_org.checkSymptom}))
+    if form.validate_on_submit():
+        print("validating")
+        print(form.checkSymptom.data)
+        new_org = Org(curr_org.orgUname, curr_org.orgPass, curr_org.orgName, curr_org.phoneorg,
+                      curr_org.des, curr_org.ceo, curr_org.orgAddress, curr_org.logoURL, 
+                      curr_org.bannerURL, curr_org.orgid, form.checkTimecard.data, form.checkMask.data, form.checkSymptom.data)
+        update_org(new_org)
+        return redirect(url_for('dashboard'))
+    print(form.errors)
     adaptNav()
     return render_template('org_management.html', form=form)
 
@@ -737,7 +741,7 @@ def org_management():
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
-    session.pop("uType",None)
+    session.clear()
     logout_user()
     return redirect(url_for('login'))
 

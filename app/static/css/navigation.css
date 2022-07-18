@@ -212,10 +212,10 @@ img[name="logo"]{
     text-decoration: none;
 }
 
-input[type="checkbox"]:checked ~ #sidebarMenu {
+input[type="checkbox"].openSidebarMenu:checked ~ #sidebarMenu {
     transform: translateX(-20px);
 }
-input[type=checkbox] {
+input[type=checkbox].openSidebarMenu {
     transition: all 0.3s;
     box-sizing: border-box;
     display: none;
@@ -261,18 +261,18 @@ input[type=checkbox] {
     float: right;
     margin-top: 5px;
 }
-input[type=checkbox]:checked ~ .sidebarIconToggle > .horizontal {
+input[type=checkbox].openSidebarMenu:checked ~ .sidebarIconToggle > .horizontal {
     transition: all 0.3s;
     box-sizing: border-box;
     opacity: 0; 
 }
-input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-1 {
+input[type=checkbox].openSidebarMenu:checked ~ .sidebarIconToggle > .diagonal.part-1 {
     transition: all 0.3s;
     box-sizing: border-box;
     transform: rotate(135deg) translateY(-3.5px);
     margin-top: 8px;
 }
-input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-2 {
+input[type=checkbox].openSidebarMenu:checked ~ .sidebarIconToggle > .diagonal.part-2 {
     transition: all 0.3s;
     box-sizing: border-box;
     transform: rotate(-135deg) translateY(3.5px);

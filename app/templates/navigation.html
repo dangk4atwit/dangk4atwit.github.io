@@ -10,7 +10,7 @@
     <div class="topnav">
         {% for item in nav.top %}
           {% if item.items %}
-            <div class="subnav"><div class={%for child in item.items%}"{{'active' if child.is_active else ''}}"{%endfor%}>
+            <div class="subnav"><div class={%for child in item.items%}{{"active" if child.is_active else ''}}{%endfor%}>
               <a class="subnavbtn"><b>{{item.label}} <i class="fa fa-caret-down" aria-hidden="true"></i>
               </b></a></div>
               <div class="subnav-content">

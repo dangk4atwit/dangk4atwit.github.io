@@ -147,9 +147,25 @@ def get_org(_id):
     org = Org.query.filter_by(orgid=_id).first()
     return org
 
+def update_org(new_org):
+    old_org = get_org(new_org.orgid)
+    if old_org != None:
+        db.session.delete(old_org)
+        db.session.commit()
+    db.session.add(new_org)
+    db.session.commit()
+
 def get_time(_id, start_week):
     time = Time.query.filter_by(user_id=_id, start_week=start_week).first()
     return time
+
+def update_time(new_time):
+    old_time = get_time(new_time.user_id, new_time.start_week)
+    if old_time != None:
+        db.session.delete(old_time)
+        db.session.commit()
+    db.session.add(new_time)
+    db.session.commit()
 
 def get_user(_id):
     user = User.query.filter_by(workId=_id).first()
