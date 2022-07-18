@@ -9,8 +9,12 @@
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Mask Verify Content</div>
+      <body>
+          <h1>Mask Verify Content</h1>
+          <div>
+            <img src="{{ url_for('video') }}" width="50%"/>
+          </div>
+        </div>
       </div>
-    </div>
     {% endblock %}
 </html>

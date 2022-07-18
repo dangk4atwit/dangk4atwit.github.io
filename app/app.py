@@ -2,7 +2,7 @@ from audioop import add
 from enum import unique
 from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in
 import bcrypt
-from flask import render_template, url_for, redirect, abort, flash, request, session
+from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from flask_navigation import Navigation
@@ -12,6 +12,28 @@ from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, 
 from flask_bcrypt import Bcrypt
 import phonenumbers
 from datetime import datetime, timedelta, timezone
+import cv2
+
+
+##################################################  CAMERA   #####################################################
+
+camera = cv2.VideoCapture(0)
+
+def gen_frames():
+    while True:
+
+        success, frame=camera.read()
+        if not success:
+            break
+        else:
+            ret, buffer=cv2.imencode('.jpg',frame)
+            frame=buffer.tobytes()
+        yield(b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
+##################################################  CAMERA   #####################################################
 
 nav = Navigation(app)   
 bcrypt = Bcrypt(app)
@@ -650,6 +672,11 @@ def mask_verify():
     form = MaskVerifyForm()
     adaptNav()
     return render_template('mask_verify.html', form=form)
+
+@app.route('/video')
+@login_required
+def video():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
     pass
