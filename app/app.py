@@ -691,7 +691,7 @@ class ProfileForm(FlaskForm):
 @login_required
 def profile():
     form = ProfileForm()
-    curr_org = get_org(1)
+    curr_org = get_org(current_user.orga_id)
     adaptNav()
 
     return render_template('profile.html', form=form, curr_org=curr_org)    
