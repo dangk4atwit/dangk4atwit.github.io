@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{current_user.orgName}}'s Management{% endblock %}  
+        {% block title %}{{current_user.orgName}}'s Org Management{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/org_management.css') }}">
         {% endblock stylesheet %}
@@ -11,10 +11,10 @@
         <div class="mainInner">
           <form method="POST" action="">
             {{ form.hidden_tag() }} 
-            <br>{{form.checkTimecard(class="setting")}} <label>Timecard</label>
-            <br>{{form.checkMask(class="setting")}} <label>Mask</label>
-            <br>{{form.checkSymptom(class="setting")}} <label>Symptom</label>
-            <br>{{form.submit}}
+            <br><div>{{form.checkTimecard}} Timecard</div>
+            <br><div>{{form.checkMask}} Mask</div>
+            <br><div>{{form.checkSymptom}} Symptom</div>
+            {{form.submit}}
           </form>
         </div>
       </div>

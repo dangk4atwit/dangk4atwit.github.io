@@ -6,6 +6,7 @@ import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFError
 from werkzeug.datastructures import MultiDict
 from flask_navigation import Navigation
 from platformdirs import user_runtime_path
@@ -648,16 +649,15 @@ def timecard_modal():
         
     return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
-
-
-
 class MaskVerifyForm(FlaskForm):
-    pass
+    submit = SubmitField("Submit Mask Verification")
     
 @app.route('/mask_verify', methods=['GET', 'POST'])
 @login_required
 def mask_verify():
     form = MaskVerifyForm()
+    if form.validate_on_submit():
+        return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('mask_verify.html', form=form)
 
@@ -667,12 +667,14 @@ def video():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
-    pass
+    submit = SubmitField("Submit Symptoms")
     
 @app.route('/symptom_check', methods=['GET', 'POST'])
 @login_required
 def symptom_check():
     form = SymptomCheckForm()
+    if form.validate_on_submit():
+        return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('symptom_check.html', form=form)
 
@@ -699,41 +701,42 @@ def profile():
     
     
 class ManagementForm(FlaskForm):
-    pass
+    submit = SubmitField("Submit Management")
 
 @app.route('/management', methods=['GET', 'POST'])
 @login_required
 def management():
     form = ManagementForm()
+    if form.validate_on_submit():
+        return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('management.html', form=form)
 
 
 class OrgManagementForm(FlaskForm):
-    checkTimecard = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
-    checkMask = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
-    checkSymptom = BooleanField(false_values=(False, 'false', 0, '0'), default=False, validators=[AnyOf([True, False])])
+    checkTimecard = BooleanField(false_values=(False, 'false', 0, '0'))
+    checkMask = BooleanField(false_values=(False, 'false', 0, '0'))
+    checkSymptom = BooleanField(false_values=(False, 'false', 0, '0'))
     submit = SubmitField("Save Settings")
 
 @app.route('/org_management', methods=['GET', 'POST'])
 @login_required
 def org_management():
     curr_org = get_org(current_user.orgid)
-    if curr_org == None:
-        form = OrgManagementForm()
-    else:
-        form = OrgManagementForm(formdata=MultiDict({'checkTimecard': curr_org.checkTimecard, 'checkMask':curr_org.checkMask, 'checkSymptom': curr_org.checkSymptom}))
+    form = OrgManagementForm()
+    if request.method == 'GET':
+        form.checkTimecard.data=curr_org.checkTimecard
+        form.checkMask.data=curr_org.checkMask
+        form.checkSymptom.data=curr_org.checkSymptom
     if form.validate_on_submit():
-        print("validating")
-        print(form.checkSymptom.data)
         new_org = Org(curr_org.orgUname, curr_org.orgPass, curr_org.orgName, curr_org.phoneorg,
-                      curr_org.des, curr_org.ceo, curr_org.orgAddress, curr_org.logoURL, 
-                      curr_org.bannerURL, curr_org.orgid, form.checkTimecard.data, form.checkMask.data, form.checkSymptom.data)
+                    curr_org.des, curr_org.ceo, curr_org.orgAddress, curr_org.logoURL, 
+                    curr_org.bannerURL, curr_org.orgid, form.checkTimecard.data, form.checkMask.data, form.checkSymptom.data)
         update_org(new_org)
         return redirect(url_for('dashboard'))
     print(form.errors)
     adaptNav()
-    return render_template('org_management.html', form=form)
+    return render_template('org_management.html', form=form, curr_org=curr_org)
 
 
 
