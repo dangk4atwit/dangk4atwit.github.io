@@ -732,6 +732,7 @@ def org_management():
         new_org = Org(curr_org.orgUname, curr_org.orgPass, curr_org.orgName, curr_org.phoneorg,
                     curr_org.des, curr_org.ceo, curr_org.orgAddress, curr_org.logoURL, 
                     curr_org.bannerURL, curr_org.orgid, form.checkTimecard.data, form.checkMask.data, form.checkSymptom.data)
+        print(form.checkTimecard.data)
         update_org(new_org)
         return redirect(url_for('dashboard'))
     print(form.errors)

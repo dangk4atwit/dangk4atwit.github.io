@@ -10,10 +10,17 @@
       <div id='center' class="main center">
         <div class="mainInner">
           <form method="POST" action="">
+            <div class="widget">
+              <Label class="widgetTitle">Enable Features</label>
+              <br>{{form.checkTimecard(class="timeCheck org")}} <div class="checkTimeButton ButtonDiv">
+                <Label class="checkTimeLabel ButtonLabel" for="checkTimecard"> Timecard</label></div>
+              <br>{{form.checkMask(class="maskCheck org")}} <div class="checkMaskButton ButtonDiv">
+                <Label class="checkMaskLabel ButtonLabel" for="checkMask"> Mask</label></div>
+              <br>{{form.checkSymptom(class="sympCheck org")}} <div class="checkSympButton ButtonDiv">
+                <Label class="checkSympLabel ButtonLabel" for="checkSymptom"> Symptom</label></div>
+            </div>
+          
             {{ form.hidden_tag() }} 
-            <br><div>{{form.checkTimecard}} Timecard</div>
-            <br><div>{{form.checkMask}} Mask</div>
-            <br><div>{{form.checkSymptom}} Symptom</div>
             {{form.submit}}
           </form>
         </div>

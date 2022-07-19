@@ -17,10 +17,107 @@
     width: 100%;
     text-align: center;
 }
-.mainInner div{
-    display:table-cell;
-    vertical-align: middle;
-    font-size: 3em;
-    font-weight: bold;
-    letter-spacing: 1.25px;
+
+input[type="checkbox"].org{
+    opacity: 0;
+    visibility: hidden;
 }
+
+.widget{
+    height: wrap;
+    width: 500px;
+    border-radius: 50px;
+    box-shadow: inset;
+    background-color: var(--vanta_black);
+    margin: 20px auto;
+    align-content: center;
+    padding: 10px;
+    padding-bottom: 30px;
+}
+
+.widgetTitle{
+    font-size: 60;
+}
+
+.ButtonLabel {
+    font-size: 30!important;
+    border-radius: 10px;
+    text-align: center!important;
+    color: var(--white);
+    font-weight: bold;
+    display: block;
+    height:100%;
+    width: 100%;
+    opacity: 75%;
+}
+.ButtonDiv {
+    background-color: var(--light_orange);
+    border-radius: 10px;
+    text-align: center!important;
+    align-items: center;
+    font-weight: bold;
+    width: 200px;
+    margin: -10px auto;
+}
+
+.ButtonLabel:hover{
+    cursor: pointer;
+}
+
+.ButtonDiv:hover{
+    background-color: var(--light_orange);
+    cursor: pointer;
+}
+
+.ButtonDiv:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+
+input[type="checkbox"].timeCheck:checked ~ div.checkTimeButton{
+    background-color: var(--orange);
+}
+
+input[type="checkbox"].sympCheck:checked ~ div.checkSympButton{
+    background-color: var(--orange);
+}
+
+input[type="checkbox"].maskCheck:checked ~ div.checkMaskButton{
+    background-color: var(--orange);
+}
+
+input[type="checkbox"].timeCheck:checked ~ div label.checkTimeLabel{
+    opacity: 100%!important;
+    color: var(--vanta_black);
+}
+input[type="checkbox"].sympCheck:checked ~ div label.checkSympLabel{
+    opacity: 100%!important;
+    color: var(--vanta_black);
+}
+input[type="checkbox"].maskCheck:checked ~ div label.checkMaskLabel{
+    opacity: 100%!important;
+    color: var(--vanta_black);
+}
+
+#submit{
+    width: 200px;  
+    height: 50px;  
+    font-size: 20px;
+    border-radius: 17px;  
+    padding-left: 7px;  
+    border-style: none;
+    color: var(--black);  
+    background-color: var(--orange);
+    font-weight: bold;
+}
+
+#submit:hover{
+    background-color: var(--light_orange);
+}
+#submit:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+
