@@ -670,6 +670,7 @@ class MaskVerifyForm(FlaskForm):
 def mask_verify():
     form = MaskVerifyForm()
     if form.validate_on_submit():
+        camera.release()
         return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('mask_verify.html', form=form)
