@@ -2,25 +2,126 @@
 
 .main {
     margin: 0 auto;
-    display: block;
-    height: 100%;
+    height: fit-content;
+    width: 1500;
     margin-top: 60px;
-    background-color: var(--black);
-}
-.mainInner {
-    background-color: var(--black);
-    color: var(--white);
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    position: relative;
 }
 .mainInner{
-    display: table;
-    height: 100%;
+    color: var(--white);
+    background-color: var(--black);
+    min-height: 100;
+    height: fit-content;
+    padding-bottom: 100px;
     width: 100%;
+    display:flex;
+    flex-direction:column;
+}
+
+.widget{
+    height: wrap;
+    width: 600px;
+    border-radius: 50px;
+    box-shadow: inset;
+    background-color: var(--vanta_black);
+    margin: 20px auto;
+    align-content: center;
+    padding: 50px;
+    padding-bottom: 30px;
+}
+
+.widgetTitle{
+    font-size: 60;
+}
+
+div.scroll {
+    height: 250px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align: center;
+    border-radius: 15px;
+    border: 1px solid var(--orange);
+}
+
+table{
+    width: 100%;
+    margin: auto;
+    border-radius: 15px;
+    border: 1px solid var(--orange);
+    
+}
+th{
+    color: var(--white);
+}
+td{
+    color: var(--white);
+    font-size: 20;
+    border-bottom: 1px solid var(--orange);
     text-align: center;
 }
-.mainInner div{
-    display:table-cell;
-    vertical-align: middle;
-    font-size: 3em;
+tr:last-child td{
+    border-bottom: none;
+}
+.tcName{
+    width: 100px;
+    overflow-y: hidden;
+}
+.tcID{
+    width: 80px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+}
+.tcDate{
+    width: 100px;
+    overflow-y: hidden;
+}
+.tcTotal{
+    width: 50px;
+    overflow-y: hidden;
+}
+
+.tcEdit{
+    border-bottom: none;
+}
+
+input[type="submit"].calbtns{
+    width: 100%;  
+    height: 100%;  
+    font-size: 20px;
+    border-radius: 17px;  
+    padding-left: 7px;  
+    border-style: none;
+    color: var(--black);  
+    background-color: var(--orange);
     font-weight: bold;
-    letter-spacing: 1.25px;
+}
+
+input[type="submit"].calbtns:hover{
+    background-color: var(--light_orange);
+}
+input[type="submit"].calbtns:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+
+input[type="submit"].alt{
+    width: 100%;  
+    height: 100%;  
+    font-size: 20px;
+    border-radius: 17px;  
+    padding-left: 7px;  
+    border-style: none;
+    color: var(--black);  
+    background-color: var(--dark_orange);
+    font-weight: bold;
+}
+
+input[type="submit"].alt:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--orange);
 }

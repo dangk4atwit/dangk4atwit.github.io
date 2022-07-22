@@ -61,6 +61,7 @@ img[name="logo"]{
     text-align: center;
     padding: 16px 16px;
     overflow: hidden;
+    transition: .3s all; 
 }
 
 .subnav .subnavbtn {
@@ -74,7 +75,7 @@ img[name="logo"]{
 
 /* Style the subnav content - positioned absolute */
 .subnav-content {
-    display:none;
+    visibility:hidden;
     position:fixed;
     height: 60px;
     left: 0;
@@ -82,13 +83,16 @@ img[name="logo"]{
     top: 50px;
     width: 100%;
     vertical-align: top;
+
+    transition: .2s all;   
 }
 
 /* When you move the mouse over the subnav container, open the subnav content */
 .subnav:hover .subnav-content {
-    display: block;
+    visibility: visible;
     height: 50px;
     overflow: hidden;
+    animation-fill-mode: forwards;
 }
 
 .subnav:hover {

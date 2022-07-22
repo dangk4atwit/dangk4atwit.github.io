@@ -9,11 +9,38 @@
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Management Content</div>
-        <form method="POST" action="">
-          {{ form.hidden_tag() }} 
-          {{form.submit}}
-        </form>
+        <div class="widget">
+          <label class="widgetTitle">Employee Timecards</label>
+            {% if tcs %}
+            <table>
+              <tr>
+                <th class="tcName">Name</th>
+                <th class="tcID">ID</th>
+                <th class="tcDate">Start Date</th>
+                <th class="tcTotal">Hours</th>
+                <th class="tcEdit">Edit</th>
+              </tr>
+            </table>
+              <div class="scroll">
+                <table>
+                  <form action='' method='POST'>
+                    {% for i in range(tcl) %}
+                      <tr>
+                        <td class="tcName">{{names[i]}}</td>
+                        <td class="tcID">{{tcs[i].user_id}}</td>
+                        <td class="tcDate">{{tcs[i].start_week}}</td>
+                        <td class="tcTotal">{{tcs[i].total}}</td>
+                        <input type='hidden' value={{i}} name='id'/>
+                        <td class="tcEdit"><input type='submit' class="calbtns {{'alt' if i % 2 == 1}}" value="Edit" /></td>
+                      </tr>
+                    {% endfor %}
+                  </form>
+                </table>
+              </div>
+            {% else %}
+              <label>No Timecards Submitted</label>
+            {% endif %}
+        </div>
       </div>
     </div>
     {% endblock %}

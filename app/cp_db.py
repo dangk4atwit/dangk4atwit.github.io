@@ -175,6 +175,18 @@ def get_clock_in(_id):
     clock = Clock.query.filter_by(user_id=_id).first()
     return clock
 
+def get_employees(_id):
+    users = User.query.filter_by(super_id=_id).all()
+    return users
+
+def get_employee_submitted_timecards(_id):
+    users = get_employees(_id)
+    times = []
+    for u in users:
+        times.extend(Time.query.filter_by(user_id=u.workId, state="submitted").all())
+    return times
+        
+    
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
