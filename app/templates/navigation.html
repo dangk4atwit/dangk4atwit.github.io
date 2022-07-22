@@ -8,7 +8,6 @@
   <div class="header">
     <div><a href="{{url_for('dashboard')}}"><img name="logo" src="{{url_for('static', filename='images/icons/Checkpoint_Logo_Large.png')}}" alt="Checkpoint Logo"></img></a></div>
     <div class="topnav">
-      <form action='' method='POST'>
         {% for item in nav.top %}
           {% if item.items %}
             <div class="subnav"><div class={%for child in item.items%}{{"active" if child.is_active else ''}}{%endfor%}>
@@ -29,7 +28,6 @@
           {% endif %}
               
         {% endfor %}
-      </form>
     </div>
   </div> 
   <input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
@@ -41,7 +39,6 @@
   <div id="sidebarMenu">
     <ul class="sidebarMenuInner">
       <li>{{current_user.fname}} {{current_user.lname}}<span>{{current_user.etype}}</span></li>
-      <form action='' method='POST'>
       {% for item in nav.top %}
         {% if item.items %}
           {% for child in item.items %}
@@ -55,7 +52,6 @@
           </li>
         {% endif %}
       {% endfor %}
-        </form>
     </ul>
     <ul class="sidebarMenuInnerBottom">
       <li><a href="{{url_for('logout')}}">Logout</a></li>
