@@ -7,12 +7,11 @@
     margin-top: 60px;
     background-color: var(--black);
 }
-.mainInner {
-    color: var(--white);
-}
+
 .mainInner{
+    color: var(--white);
     display: table;
-    height: 100%;
+    min-height: 800px;
     width: 100%;
     align-items: center;
     text-align: center;
