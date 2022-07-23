@@ -1,7 +1,8 @@
 from audioop import add
 from enum import unique
+from turtle import width
 from typing import Any
-from cp_db import User, Org, Time, Clock, app, db, get_org, get_time, get_user, get_clock_in, update_time, update_org, get_employee_submitted_timecards
+from cp_db import User, Org, Time, Clock, Verify, app, db, get_verify, get_org, get_time, get_user, get_clock_in, update_time, update_org, get_employee_submitted_timecards
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -20,33 +21,136 @@ import cv2
 
 ##################################################  CAMERA   #####################################################
 
-def gen_frames():
-    try:
-        camera = cv2.VideoCapture(0)
-        while True:
-            success, frame=camera.read()
-            if not success:
-                break
-            else:
-                detector=cv2.CascadeClassifier('app/Haarcascades/haarcascade_frontalface_default.xml')
-                eye_cascade = cv2.CascadeClassifier('app/Haarcascades/haarcascade_eye.xml')
-                faces=detector.detectMultiScale(frame,1.3, 7)
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    #drawing the outline box to look for face features
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
-                    roi_gray = gray[x:x+w, y:y+w]
-                    roi_color = frame[x:x+w, y:y+h]
-                    eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 7)
-                    for (ex, ey, ew, eh) in eyes:
-                        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 3)
+from keras.models import load_model
+from PIL import Image, ImageOps
+import numpy as np
+import pickle
+from keras import backend as K
+from tensorflow import Graph, Session
 
-                ret, buffer=cv2.imencode('.jpg',frame)
-                frame=buffer.tobytes()
-                yield(b'--frame\r\n'
-                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-    finally:
-        camera.release()
+def join(source_dir, dest_file, read_size):
+    # Create a new destination file
+    output_file = open(dest_file, 'wb')
+
+    # Get a list of the file parts
+    parts = ['final_model1', 'final_model2', 'final_model3']
+
+    # Go through each portion one by one
+    for file in parts:
+
+        # Assemble the full path to the file
+        path = file
+
+        # Open the part
+        input_file = open(path, 'rb')
+
+        while True:
+            # Read all bytes of the part
+            bytes = input_file.read(read_size)
+
+            # Break out of loop if we are at end of file
+            if not bytes:
+                break
+
+            # Write the bytes to the output file
+            output_file.write(bytes)
+
+        # Close the input file
+        input_file.close()
+
+    # Close the output file
+    output_file.close()
+
+
+join(source_dir='', dest_file="Combined_Model.p", read_size=50000000)
+
+
+classifier=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+size = 4
+labels_dict={0:'mask',1:'no mask'}
+color_dict={0:(0,255,0),1:(0,0,255)}
+global loaded_model
+graph1 = Graph()
+with graph1.as_default():
+	session1 = Session(graph=graph1)
+	with session1.as_default():
+		loaded_model = pickle.load(open('Combined_Model.p', 'rb'))
+
+class VideoCamera(object):
+    def __init__(self):
+        self.video = cv2.VideoCapture(0)
+    
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+        (rval, im) = self.video.read()
+        im = cv2.flip(im, 1, 1)
+        mini = cv2.resize(im, (im.shape[1] // size, im.shape[0] // size))
+        faces = classifier.detectMultiScale(mini)
+        for f in faces:
+            (x, y, w, h) = [v * size for v in f] 
+            face_img = im[y:y+h, x:x+w]
+            resized=cv2.resize(face_img,(300,300))
+            normalized=resized/255.0
+            reshaped=np.reshape(normalized,(1,300,300,3))
+            reshaped = np.vstack([reshaped])
+            K.set_session(session1)
+            with graph1.as_default():
+                results=loaded_model.predict(reshaped)
+            if results >.5:
+                result = np.array([[1]])
+            else:
+                result = np.array([[0]])
+            label = np.argmax(result)
+            cv2.rectangle(im,(x,y),(x+w,y+h),color_dict[result[label][0]],2)
+            cv2.rectangle(im,(x,y-40),(x+w,y),color_dict[result[label][0]],-1)
+            cv2.putText(im, labels_dict[result[label][0]], (x, y-10),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
+            
+        ret, jpeg = cv2.imencode('.jpg', im)
+        return jpeg.tobytes()
+
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+
+# def gen_frames():
+#     try:
+#         camera = cv2.VideoCapture(0)
+#         while True:
+#             success, frame=camera.read()
+#             if not success:
+#                 break
+#             else:
+#                 face_detect=cv2.CascadeClassifier('app/Haarcascades/haarcascade_frontalface_default.xml')
+#                 eye_detect = cv2.CascadeClassifier('app/Haarcascades/haarcascade_eye.xml')
+#                 mouth_detect = cv2.CascadeClassifier('app/Haarcascades/jaarcascade_smile.xml')
+#                 faces=face_detect.detectMultiScale(frame,1.3, 7)
+#                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#                     #drawing the outline box to look for face features
+#                 for (x, y, w, h) in faces:
+#                     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
+#                     roi_gray = gray[x:x+w, y:y+w]
+#                     roi_color = frame[x:x+w, y:y+h]
+#                     eyes = eye_detect.detectMultiScale(roi_gray, 1.3, 7)
+#                     mouth = mouth_detect.detectMultiScale(frame, 1.3, 7)
+#                     for (ex, ey, ew, eh) in eyes:
+#                         cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 3)
+#                     for (mx, my, mw, mh) in mouth:
+#                         #my=int(my-0.15*mh)
+#                         cv2.rectangle(roi_color, (mx, my), (mx+mw, my+mh), (0, 255, 0), 3)
+
+#                 ret, buffer=cv2.imencode('.jpg',frame)
+#                 frame=buffer.tobytes()
+#                 yield(b'--frame\r\n'
+#                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+#     finally:
+#         camera.release()
 
 
 
@@ -679,7 +783,7 @@ def mask_verify():
 @app.route('/video')
 @login_required
 def video():
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
     submit = SubmitField("Submit Symptoms")

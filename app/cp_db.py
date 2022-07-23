@@ -10,7 +10,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_BINDS'] = {
     'organization': 'sqlite:///organizations.db',
     'timecard': 'sqlite:///timecards.db',
-    'clock' : 'sqlite:///clocks.db'
+    'clock' : 'sqlite:///clocks.db',
+    'verify' : 'sqlite:///verify.db'
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -142,6 +143,27 @@ class Clock(db.Model, UserMixin):
 
 db.create_all(bind=['clock'])
 db.session.commit()
+
+class Verify(db.Model, UserMixin):
+    __bind_key__ = 'veify'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    maskverify = db.Column(db.String(10), nullable=False)
+    symptomverify = db.Column(db.Boolean, nullable=False)
+    info={'bind_key':'verify'}
+    
+    def __init__(self, user_id, maskverify, symptomverify):
+        self.user_id = user_id
+        self.maskverify = maskverify
+        self.symptomverify = symptomverify
+
+
+db.create_all(bind=['verify'])
+db.session.commit()
+
+def get_verify(_id):
+    verify=Verify.query.filter_by(user_id=_id).first()
+    return verify
 
 def get_org(_id):
     org = Org.query.filter_by(orgid=_id).first()
