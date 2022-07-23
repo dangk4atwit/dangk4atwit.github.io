@@ -30,16 +30,16 @@ def gen_frames():
             else:
                 detector=cv2.CascadeClassifier('app/Haarcascades/haarcascade_frontalface_default.xml')
                 eye_cascade = cv2.CascadeClassifier('app/Haarcascades/haarcascade_eye.xml')
-                faces=detector.detectMultiScale(frame,1.1,7)
+                faces=detector.detectMultiScale(frame,1.3, 7)
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     #drawing the outline box to look for face features
                 for (x, y, w, h) in faces:
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                    roi_gray = gray[y:y+h, x:x+w]
-                    roi_color = frame[y:y+h, x:x+w]
-                    eyes = eye_cascade.detectMultiScale(roi_gray, 1.1, 3)
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
+                    roi_gray = gray[x:x+w, y:y+w]
+                    roi_color = frame[x:x+w, y:y+h]
+                    eyes = eye_cascade.detectMultiScale(roi_gray, 1.3, 7)
                     for (ex, ey, ew, eh) in eyes:
-                        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
+                        cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 3)
 
                 ret, buffer=cv2.imencode('.jpg',frame)
                 frame=buffer.tobytes()
