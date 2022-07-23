@@ -1,0 +1,117 @@
+@import "management.css";
+
+.blur {
+    position: absolute!important;
+    z-index: 99!important;
+    margin: 0 auto!important;
+    height: 100vh!important;
+    width: 100vw!important;
+    background-color: var(--white)!important;
+    opacity: 50%!important;
+    filter: blur(8px)!important;
+    background-size: cover!important;
+    display: block!important;
+    top: 60px;
+    left: 0;
+}
+
+.modal {
+    position: absolute!important;
+    margin: 0 auto;
+    top: 60px;
+    left: 37.5%;
+    text-align: center!important;
+    z-index: 100!important;
+    height: 300px!important;
+    width: 500px!important;
+    background-color: var(--black)!important;
+}
+
+.mainInner div.tableContainer{
+    display:table-cell;
+    vertical-align: middle;
+    font-size: 3em;
+    font-weight: bold;
+    letter-spacing: 1.25px;
+    text-align: center;
+    align-items: center;
+}
+
+.mainInner div table, th, td {
+    border: 1px solid var(--vanta_black);
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.mainInner div table {
+    margin: auto;
+    position: relative;
+    table-layout: auto;
+    border-collapse: separate;
+    width: 80%;
+    border-radius: 20px;
+    border-color: var(--vanta_black);
+}
+
+label {
+    color: var(--white);
+    font-weight: bold;
+}
+
+th {
+    color: var(--white);
+    background-color: var(--vanta_black);
+    font-size:30px;
+    font-weight: bold;
+}
+
+th:first-child {
+    border-top-left-radius: 20px;
+}
+
+th:last-child {
+    border-top-right-radius: 20px;
+}
+
+tr td form{
+    margin: 0 auto;
+    white-space: nowrap;
+    align-items: center;
+    text-align: center;
+}
+
+tr:last-child td:first-child {
+    border-bottom-left-radius: 20px;
+}
+tr:last-child td:first-child form .calbtns{
+    border-bottom-left-radius: 20px;
+}
+
+tr:last-child td:last-child {
+    border-bottom-right-radius: 20px;
+}
+tr:last-child td:last-child form .calbtns{
+    border-bottom-right-radius: 20px;
+}
+
+form div {
+    white-space: nowrap;
+    align-items: center;
+    text-align: left;
+    font-size: 40;
+    font-weight: bold;
+}
+
+.dayNum {
+    color: var(--white)
+}
+
+form div.dayHours {
+    margin: 0 auto;
+    font-weight: bold;
+    height: 200px;
+    width: 200px;
+    font-size: 50;
+    color: var(--orange);
+    background-color: var(--black2);
+}

@@ -23,7 +23,7 @@
             </table>
               <div class="scroll">
                 <table>
-                  <form action='' method='POST'>
+                  <form action='/load_timecard_view_modal' method='POST'>
                     {% for i in range(tcl) %}
                       <tr>
                         <td class="tcName">{{names[i]}}</td>
@@ -38,7 +38,8 @@
                 </table>
               </div>
             {% else %}
-              <label>No Timecards Submitted</label>
+              <br>
+              <br><label>No Timecards Submitted</label>
             {% endif %}
         </div>
       </div>

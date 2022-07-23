@@ -122,9 +122,9 @@ def adaptNav():
     nav.Bar('top', navItems)
 
 
-def getWeeks():
+def getWeeks(user):
     week_count = 0
-    pay_interval = str(current_user.payInt)
+    pay_interval = str(user.payInt)
     
     if "weekly" in pay_interval.lower():
         week_count = 1
@@ -156,24 +156,24 @@ def getListOfDayDates(days, sunday):
         dayNums.append("/".join([str(newDay.month), str(newDay.day), str(newDay.year)]))
     return dayNums
 
-def getTimecardHours(startDate, timecardDays):
+def getTimecardHours(_id, startDate, timecardDays):
     
-    time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
+    time = get_time(_id, startDate.strftime('%m/%d/%Y'))
     
     if time == None:
-        generateEmptyTimecard(startDate)
-        time = get_time(current_user.workId, startDate.strftime('%m/%d/%Y'))
+        generateEmptyTimecard(_id, startDate)
+        time = get_time(_id, startDate.strftime('%m/%d/%Y'))
     fillCurrTime(time, True)
     if len(timecardDays) > 7:
         nextDate = startDate + timedelta(days=7)
-        nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
+        nextTime = get_time(_id, nextDate.strftime('%m/%d/%Y'))
         if nextTime == None:
-            generateEmptyTimecard(nextDate)
-            nextTime = get_time(current_user.workId, nextDate.strftime('%m/%d/%Y'))
+            generateEmptyTimecard(_id, nextDate)
+            nextTime = get_time(_id, nextDate.strftime('%m/%d/%Y'))
         fillCurrTime(nextTime, False) 
 
-def generateEmptyTimecard(startDate):
-    newTime = Time(current_user.workId, startDate.strftime('%m/%d/%Y'), "0", "0", "0", "0", "0", "0", "0", "0", "none")
+def generateEmptyTimecard(_id, startDate):
+    newTime = Time(_id, startDate.strftime('%m/%d/%Y'), "0", "0", "0", "0", "0", "0", "0", "0", "none")
     db.session.add(newTime)
     db.session.commit()
     
@@ -251,19 +251,19 @@ def calculateTotalHours():
     return ":".join([str(totalHours),str(totalMinutes)])
         
 
-def saveTimecard(startDate, status):
+def saveTimecard(_id, startDate, status):
     curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == None:
         return
     if curr_timecard_hours == []:
         return
-    newTime = Time(current_user.workId, startDate.strftime('%m/%d/%Y'), curr_timecard_hours[0], 
+    newTime = Time(_id, startDate.strftime('%m/%d/%Y'), curr_timecard_hours[0], 
     curr_timecard_hours[1], curr_timecard_hours[2], curr_timecard_hours[3], curr_timecard_hours[4], curr_timecard_hours[5], 
     curr_timecard_hours[6], calculateTotalHours(), status)
     update_time(newTime)
     if len(curr_timecard_hours) > 7:
         nextDate = startDate + timedelta(days=7)
-        nextNewTime = Time(current_user.workId, nextDate.strftime('%m/%d/%Y'), curr_timecard_hours[7], 
+        nextNewTime = Time(_id, nextDate.strftime('%m/%d/%Y'), curr_timecard_hours[7], 
         curr_timecard_hours[8], curr_timecard_hours[9], curr_timecard_hours[10], curr_timecard_hours[11], curr_timecard_hours[12], 
         curr_timecard_hours[13], calculateTotalHours(), status)
         update_time(nextNewTime)
@@ -542,36 +542,36 @@ class TimecardForm(FlaskForm):
 def timecard():
     if "bi" in current_user.payInt.lower():
         startDate = determineBiweeklyStart()
-        form = TimecardForm(amount=getWeeks()*7, sunday=startDate)
+        form = TimecardForm(amount=getWeeks(current_user)*7, sunday=startDate)
     else:
         startDate = getLastSunday()
-        form = TimecardForm(amount=getWeeks()*7, sunday=getLastSunday())
+        form = TimecardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
     
     curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == None:
-        getTimecardHours(startDate, form.dayVals)
+        getTimecardHours(current_user.workId, startDate, form.dayVals)
         curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == []:
-        getTimecardHours(startDate, form.dayVals)
+        getTimecardHours(current_user.workId, startDate, form.dayVals)
         curr_timecard_hours = session.get("curr_timecard_hours", None)
     
     total = calculateTotalHours()
     
     if form.validate_on_submit():
         if form.saveDraft.data:
-            saveTimecard(startDate, "none")
+            saveTimecard(current_user.workId, startDate, "none")
         elif form.clockIn.data:
             clock_in()
         elif form.clockOut.data:
             clock_out(startDate)
-            saveTimecard(startDate, "none")
+            saveTimecard(current_user.workId, startDate, "none")
         else:
-            saveTimecard(startDate, "submitted")
+            saveTimecard(current_user.workId, startDate, "submitted")
             
         session.pop("curr_timecard_hours")
         return redirect(url_for('timecard'))
     adaptNav()
-    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
+    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(current_user), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
 
 
 
@@ -639,10 +639,11 @@ def timecard_modal():
         return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
     adaptNav()
+    weeks=getWeeks(current_user)
     if "bi" in current_user.payInt.lower():
-        dayVals = getListOfDayVals(getWeeks()*7, determineBiweeklyStart())
+        dayVals = getListOfDayVals(weeks*7, determineBiweeklyStart())
     else:
-        dayVals = getListOfDayVals(getWeeks()*7, getLastSunday())
+        dayVals = getListOfDayVals(weeks*7, getLastSunday())
     curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == None:
         return redirect(url_for('timecard'))
@@ -661,7 +662,7 @@ def timecard_modal():
         session.pop("curr_timecard_index")
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, weeks = getWeeks(), today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
+    return render_template('tc-modal.html', form=form, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 class MaskVerifyForm(FlaskForm):
     submit = SubmitField("Submit Mask Verification")
@@ -731,6 +732,54 @@ def management():
     tcLength = len(timecards)
     adaptNav()
     return render_template('management.html', form=form, tcs=timecards, tcl=tcLength, names=names)
+
+@app.route('/load_timecard_view_modal', methods=['GET', 'POST'])
+@login_required
+def loadTCViewModal():
+    if request.method == "POST":
+        timecards = get_employee_submitted_timecards(current_user.workId)
+        id = request.form["id"]
+        startDate = datetime.strptime(timecards[int(id)].start_week, '%m/%d/%Y')
+        startDate = startDate.astimezone(LOCAL_TIMEZONE)
+        user = get_user(timecards[int(id)].user_id)
+        dayVals = getListOfDayVals(getWeeks(user)*7, startDate)
+        getTimecardHours(timecards[int(id)].user_id, startDate, dayVals)
+        session["curr_timecard_index"] = int(id)
+        return redirect(url_for("timecard_view_modal"))
+
+class Timecard_Modal_View_Form(FlaskForm):
+    decline = SubmitField("Decline")
+    confirm = SubmitField("Confirm")
+
+@app.route('/timecard_view_modal', methods=['GET', 'POST'])
+@login_required
+def timecard_view_modal():
+    curr_timecard_index = session.get("curr_timecard_index", None)
+    if curr_timecard_index == None:
+        return redirect(url_for('dashboard'))
+    if curr_timecard_index == -1:
+        return redirect(url_for('dashboard'))
+    timecards = get_employee_submitted_timecards(current_user.workId)
+    startDate = datetime.strptime(timecards[int(curr_timecard_index)].start_week, '%m/%d/%Y')
+    startDate = startDate.astimezone(LOCAL_TIMEZONE)
+    user = get_user(timecards[int(curr_timecard_index)].user_id)
+    weeks=getWeeks(user)
+    dayVals = getListOfDayVals(weeks*7, startDate)
+    form = Timecard_Modal_View_Form()
+    adaptNav()
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        return redirect(url_for('management'))
+    if form.validate_on_submit():
+        if form.decline.data:
+            saveTimecard(timecards[int(curr_timecard_index)].user_id, startDate, "Denied")
+        if form.confirm.data:
+            saveTimecard(timecards[int(curr_timecard_index)].user_id, startDate, "Confirmed")
+        session.pop("curr_timecard_index")
+        session.pop("curr_timecard_hours")
+        return redirect(url_for('management'))
+        
+    return render_template('tc-view-modal.html', form=form, weeks=weeks, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
 
 
 class OrgManagementForm(FlaskForm):
