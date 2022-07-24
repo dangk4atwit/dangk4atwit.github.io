@@ -9,51 +9,42 @@
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
+        {% if uType == "user" %}
           {% if curr_org.checkMask or curr_org.checkSymptom %}
             <div class="card verify">
               <form method="POST" activity="">
                 {{ form.hidden_tag() }} 
-                
-                {% if verified %}
-                  <div class="verBack green">
-                    <label>{{nowDate}}</label>
-                    <label>{{nowTime}}</label>
-                    {{form.refresh}}
-                    <label>Verified</label>
-                    <br><label>{{nowDate}}</label>
-                    <br><label>{{nowTime}}</label>
-                    
+                <div class="verBack {{'green' if verified else 'red'}}">
+                  <label class="cardTimeLabel">Last Checked:</label>
+                  <label class="cardDate">{{nowDate}}</label>
+                  <label class="cardTime">{{nowTime}}</label>
+                  {{form.refresh}}
+                  <div class="cardTop"><label class="cardHead">{{'Verified' if verified else 'Not Verified'}}</label></div>
+                  <div class= "itemHeader">
+                    {% if curr_org.checkMask %}
+                      <p>Mask Check</p>
+                    {% endif %}
+                    {% if curr_org.checkSymptom %}
+                      <p>Submit Symptom</p>
+                    {% endif %}
                   </div>
-                {% else %}
-                  <div class="verBack red">
-                    {{form.refresh}}
-                    <div class="cardTop"><label class="cardHead">Not Verified</label></div>
-                    <div class= "itemHeader">
-                      {% if curr_org.checkMask %}
-                        <p>Mask Check</p>
+                  <div class="itemBody">
+                    {% if curr_org.checkMask %}
+                      {% if verify.maskVerify %}
+                        <p>Completed</p>
+                      {% else %}
+                        <p>{{form.toMask}}</p>
                       {% endif %}
-                      {% if curr_org.checkSymptom %}
-                        <p>Submit Symptom</p>
+                    {% endif %}
+                    {% if curr_org.checkSymptom %}
+                      {% if verify.symptomVerify%}
+                        <p>Completed</p>
+                      {% else %}
+                        <p>{{form.toSymptom}}</p>
                       {% endif %}
-                    </div>
-                    <div class="itemBody">
-                      {% if curr_org.checkMask %}
-                        {% if verify.maskVerify %}
-                          <p>Completed</p>
-                        {% else %}
-                          <p>{{form.toMask}}</p>
-                        {% endif %}
-                      {% endif %}
-                      {% if curr_org.checkSymptom %}
-                        {% if verify.symptomVerify%}
-                          <p>Completed</p>
-                        {% else %}
-                          <p>{{form.toSymptom}}</p>
-                        {% endif %}
-                      {% endif %}
-                    </div>
+                    {% endif %}
                   </div>
-                {% endif %}
+                </div>
               </form>
             </div>
           {% endif %}
@@ -72,6 +63,9 @@
               </div>
             </div>
           {% endif %}
+        {% else %}
+          <label>No Dashboard Content</label>
+        {% endif %}
       </div>
     </div>
     {% endblock content%}

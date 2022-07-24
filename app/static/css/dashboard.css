@@ -104,6 +104,26 @@ input[name="refresh"]{
     border-radius: 30px;
 }
 
+.cardTimeLabel{
+    position: absolute;
+    bottom: 160px;
+    left: 90px;
+    font-size: 30px;
+}
+
+.cardDate {
+    position: absolute;
+    bottom: 140px;
+    left: 130px;
+    font-size: 20px;
+}
+
+.cardTime {
+    position: absolute;
+    bottom: 120px;
+    left: 150px;
+    font-size: 20px;
+}
 
 .clockBtn {
     position: absolute;

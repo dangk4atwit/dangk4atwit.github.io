@@ -684,66 +684,75 @@ def login():
 
 
 
-class DashboardForm(FlaskForm):
+class UserDashboardForm(FlaskForm):
     toMask = SubmitField("Mask Check")
     toSymptom = SubmitField("Symptom Check")
     refresh = SubmitField("Refresh")
     clockIn = SubmitField("Clock In")
     clockOut = SubmitField("Clock Out")
     def __init__(self, amount, sunday, *args, **kwargs):
-        super(DashboardForm, self).__init__(*args, **kwargs)
+        super(UserDashboardForm, self).__init__(*args, **kwargs)
         self.dayVals = getListOfDayVals(amount, sunday)
         c = get_clock_in(current_user.workId)
         if c is not None:
             self.lastClockIn = c.clock_in
         else:
             self.lastClockIn = "None"
+
+class OrgDashboardForm(FlaskForm):
+    pass
     
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    if "bi" in current_user.payInt.lower():
-        startDate = determineBiweeklyStart()
-        form = DashboardForm(amount=getWeeks(current_user)*7, sunday=startDate)
-    else:
-        startDate = getLastSunday()
-        form = DashboardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
-    
-    curr_timecard_hours = session.get("curr_timecard_hours", None)
-    if curr_timecard_hours == None:
-        getTimecardHours(current_user.workId, startDate, form.dayVals)
-        curr_timecard_hours = session.get("curr_timecard_hours", None)
-    if curr_timecard_hours == []:
-        getTimecardHours(current_user.workId, startDate, form.dayVals)
-        curr_timecard_hours = session.get("curr_timecard_hours", None)
-    
-    now = datetime.now(LOCAL_TIMEZONE)
-    nowString = now.strftime('%m/%d/%Y|%H:%M').split("|")
-    nowDate = nowString[0]
-    nowTime = nowString[1]
-    
-    verified = checkVerified(current_user.workId)
-    verify = get_verify(current_user.workId)
-    
-    curr_org = get_org(current_user.orga_id)
-    
-    if form.validate_on_submit():
-        if form.clockIn.data:
-            clock_in()
-        elif form.clockOut.data:
-            clock_out(startDate)
-            saveTimecard(current_user.workId, startDate, "none")
-        elif form.toMask.data:
-            session.pop("curr_timecard_hours")
-            return redirect(url_for('mask_verify'))
-        elif form.toSymptom.data:
-            session.pop("curr_timecard_hours")
-            return redirect(url_for('symptom_check'))
+    uType = session.get("uType",None)
+    if uType == "user":
+        if "bi" in current_user.payInt.lower():
+            startDate = determineBiweeklyStart()
+            form = UserDashboardForm(amount=getWeeks(current_user)*7, sunday=startDate)
+        else:
+            startDate = getLastSunday()
+            form = UserDashboardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
         
-        session.pop("curr_timecard_hours")
-        return redirect(url_for('dashboard'))
-    adaptNav()
-    return render_template('dashboard.html', form=form, clocked = isClockedIn(), verified=verified, verify=verify, curr_org=curr_org, nowDate=nowDate, nowTime=nowTime)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
+        if curr_timecard_hours == None:
+            getTimecardHours(current_user.workId, startDate, form.dayVals)
+            curr_timecard_hours = session.get("curr_timecard_hours", None)
+        if curr_timecard_hours == []:
+            getTimecardHours(current_user.workId, startDate, form.dayVals)
+            curr_timecard_hours = session.get("curr_timecard_hours", None)
+        
+        now = datetime.now(LOCAL_TIMEZONE)
+        nowString = now.strftime('%m/%d/%Y|%H:%M').split("|")
+        nowDate = nowString[0]
+        nowTime = nowString[1]
+        
+        verified = checkVerified(current_user.workId)
+        verify = get_verify(current_user.workId)
+        
+        curr_org = get_org(current_user.orga_id)
+        
+        if form.validate_on_submit():
+            if form.clockIn.data:
+                clock_in()
+            elif form.clockOut.data:
+                clock_out(startDate)
+                saveTimecard(current_user.workId, startDate, "none")
+            elif form.toMask.data:
+                session.pop("curr_timecard_hours")
+                return redirect(url_for('mask_verify'))
+            elif form.toSymptom.data:
+                session.pop("curr_timecard_hours")
+                return redirect(url_for('symptom_check'))
+            
+            session.pop("curr_timecard_hours")
+            return redirect(url_for('dashboard'))
+        adaptNav()
+        return render_template('dashboard.html', form=form, uType=uType, clocked = isClockedIn(), verified=verified, verify=verify, curr_org=curr_org, nowDate=nowDate, nowTime=nowTime)
+    else:
+        form = OrgDashboardForm()
+        adaptNav()
+        return render_template('dashboard.html', form=form, uType=uType)
 
 
 
