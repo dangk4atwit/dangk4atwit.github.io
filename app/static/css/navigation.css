@@ -289,6 +289,5 @@ input[type=checkbox].openSidebarMenu:checked ~ .sidebarIconToggle > .diagonal.pa
     height: 250px;
     background-color: var(--vanta_black);
     position: relative;
-    margin-top: -50px;
-    bottom: 0;
+    bottom: -250px;
 }

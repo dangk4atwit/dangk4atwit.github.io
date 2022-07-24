@@ -2,7 +2,7 @@ from audioop import add
 from enum import unique
 from turtle import width
 from typing import Any
-from cp_db import User, Org, Time, Clock, Verify, app, db, get_verify, get_org, get_time, get_user,get_clock_in, update_time, update_org, get_employee_submitted_timecards, update_verify
+from cp_db import User, Org, Time, Clock, Verify, app, db, get_verify, get_org, get_time, get_user,get_clock_in, update_time, update_org, get_employee_submitted_timecards, update_verify, update_clock
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
@@ -372,14 +372,9 @@ def saveTimecard(_id, startDate, status):
         update_time(nextNewTime)
 
 def clock_in():
-    c = get_clock_in(current_user.workId)
-    if c is not None:
-        db.session.delete(c)
-        db.session.commit()
     now = datetime.now(LOCAL_TIMEZONE)
     newC = Clock(current_user.workId, now.strftime('%m/%d/%Y|%H:%M'), False)
-    db.session.add(newC)
-    db.session.commit()
+    update_clock(newC)
 
 def seconds_to_hours_string(seconds):
     hours = int(seconds/(3600))
@@ -393,23 +388,26 @@ def seconds_to_hours_string(seconds):
 
 def clock_out(sunday):
     c = get_clock_in(current_user.workId)
-    if c is not None:
-        db.session.delete(c)
-        db.session.commit()
     inTime = datetime.strptime(c.clock_in, '%m/%d/%Y|%H:%M')
     inTime = inTime.astimezone(LOCAL_TIMEZONE)
     now = datetime.now(LOCAL_TIMEZONE)
     
     if "bi" in current_user.payInt.lower():
         if (sunday - now).days > 14:
+            session.pop("curr_timecard_index")
+            newC = Clock(current_user.workId, c.clock_in, True)
+            update_clock(newC)
             return
     else:
         if (sunday - now).days > 7:
+            session.pop("curr_timecard_index")
+            newC = Clock(current_user.workId, c.clock_in, True)
+            update_clock(newC)
             return
     
     if sunday > inTime:
         return
-
+    
     nextDate = inTime
     daysDifference = (inTime - now).days
     if daysDifference > 0:
@@ -433,8 +431,7 @@ def clock_out(sunday):
         addTimecardHour(inputHours)
     session.pop("curr_timecard_index")
     newC = Clock(current_user.workId, c.clock_in, True)
-    db.session.add(newC)
-    db.session.commit()
+    update_clock(newC)
     
 def isClockedIn():
     c = get_clock_in(current_user.workId)
@@ -449,54 +446,6 @@ def newVerify(_id):
     if verify == None:
         newV = Verify(_id, False, "None", False, "None")
         update_verify(newV)
-    
-
-def checkSymptomVerified(_id):
-    verify = get_verify(_id)
-    if verify == None:
-        newVerify(_id)
-        return False
-    if verify.symptomVerify:
-        if verify.symptomTime == "None":
-            return False
-        symptomTime = datetime.strptime(verify.symptomTime, '%m/%d/%Y|%H:%M')
-        symptomTime = symptomTime.astimezone(LOCAL_TIMEZONE)
-        now = datetime.now(LOCAL_TIMEZONE)
-        if now - timedelta(days=1) > symptomTime:
-            return False
-        return True
-    return False
-
-def checkMaskVerified(_id):
-    verify = get_verify(_id)
-    if verify == None:
-        newVerify(_id)
-        return False
-    if verify.maskVerify:
-        if verify.maskTime == "None":
-            return False
-        maskTime = datetime.strptime(verify.maskTime, '%m/%d/%Y|%H:%M')
-        maskTime = maskTime.astimezone(LOCAL_TIMEZONE)
-        now = datetime.now(LOCAL_TIMEZONE)
-        if now - timedelta(days=1) > maskTime:
-            return False
-        return True
-    return False
-
-def checkVerified(_id):
-    verify = get_verify(_id)
-    if verify == None:
-        newVerify(_id)
-        return False
-    curr_org = get_org(current_user.orga_id)
-    if curr_org == None:
-        return False
-    verifiedArr = []
-    if curr_org.checkMask:
-        verifiedArr.append(checkMaskVerified(_id))
-    if curr_org.checkSymptom:
-        verifiedArr.append(checkSymptomVerified(_id))
-    return all(x for x in verifiedArr)
     
 
 def submitSymptom(_id, hasSymp):
@@ -518,6 +467,57 @@ def submitMask(_id, hasMask):
         old_verify = get_verify(_id)
     new_verify = Verify(_id, not hasMask, newMaskTime, old_verify.symptomVerify, old_verify.symptomTime)
     update_verify(new_verify)
+    
+
+def checkSymptomVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    if verify.symptomVerify:
+        if verify.symptomTime == "None":
+            return False
+        symptomTime = datetime.strptime(verify.symptomTime, '%m/%d/%Y|%H:%M')
+        symptomTime = symptomTime.astimezone(LOCAL_TIMEZONE)
+        now = datetime.now(LOCAL_TIMEZONE)
+        if now - timedelta(days=1) > symptomTime:
+            submitSymptom(_id, True)
+            return False
+        return True
+    return False
+
+def checkMaskVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    if verify.maskVerify:
+        if verify.maskTime == "None":
+            return False
+        maskTime = datetime.strptime(verify.maskTime, '%m/%d/%Y|%H:%M')
+        maskTime = maskTime.astimezone(LOCAL_TIMEZONE)
+        now = datetime.now(LOCAL_TIMEZONE)
+        if now - timedelta(days=1) > maskTime:
+            submitMask(_id, False)
+            return False
+        return True
+    return False
+
+def checkVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    curr_org = get_org(current_user.orga_id)
+    if curr_org == None:
+        return False
+    verifiedArr = []
+    if curr_org.checkMask:
+        verifiedArr.append(checkMaskVerified(_id))
+    if curr_org.checkSymptom:
+        verifiedArr.append(checkSymptomVerified(_id))
+    return all(x for x in verifiedArr)
+    
     
 ####################################################            FORMS & PAGES              #################################################################################
 
@@ -685,17 +685,65 @@ def login():
 
 
 class DashboardForm(FlaskForm):
-    firstName = "Test"
-    lastName = "Name"
-    title = "Test Title"
-    isAdmin = False
+    toMask = SubmitField("Mask Check")
+    toSymptom = SubmitField("Symptom Check")
+    refresh = SubmitField("Refresh")
+    clockIn = SubmitField("Clock In")
+    clockOut = SubmitField("Clock Out")
+    def __init__(self, amount, sunday, *args, **kwargs):
+        super(DashboardForm, self).__init__(*args, **kwargs)
+        self.dayVals = getListOfDayVals(amount, sunday)
+        c = get_clock_in(current_user.workId)
+        if c is not None:
+            self.lastClockIn = c.clock_in
+        else:
+            self.lastClockIn = "None"
     
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    form = DashboardForm()
+    if "bi" in current_user.payInt.lower():
+        startDate = determineBiweeklyStart()
+        form = DashboardForm(amount=getWeeks(current_user)*7, sunday=startDate)
+    else:
+        startDate = getLastSunday()
+        form = DashboardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
+    
+    curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        getTimecardHours(current_user.workId, startDate, form.dayVals)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == []:
+        getTimecardHours(current_user.workId, startDate, form.dayVals)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
+    
+    now = datetime.now(LOCAL_TIMEZONE)
+    nowString = now.strftime('%m/%d/%Y|%H:%M').split("|")
+    nowDate = nowString[0]
+    nowTime = nowString[1]
+    
+    verified = checkVerified(current_user.workId)
+    verify = get_verify(current_user.workId)
+    
+    curr_org = get_org(current_user.orga_id)
+    
+    if form.validate_on_submit():
+        if form.clockIn.data:
+            clock_in()
+        elif form.clockOut.data:
+            clock_out(startDate)
+            saveTimecard(current_user.workId, startDate, "none")
+        elif form.toMask.data:
+            session.pop("curr_timecard_hours")
+            return redirect(url_for('mask_verify'))
+        elif form.toSymptom.data:
+            session.pop("curr_timecard_hours")
+            return redirect(url_for('symptom_check'))
+        
+        session.pop("curr_timecard_hours")
+        return redirect(url_for('dashboard'))
     adaptNav()
-    return render_template('dashboard.html', form=form)
+    return render_template('dashboard.html', form=form, clocked = isClockedIn(), verified=verified, verify=verify, curr_org=curr_org, nowDate=nowDate, nowTime=nowTime)
 
 
 

@@ -148,7 +148,7 @@ class Verify(db.Model, UserMixin):
     __bind_key__ = 'verify'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    maskVerify = db.Column(db.String(10), nullable=False)
+    maskVerify = db.Column(db.Boolean, nullable=False)
     maskTime = db.Column(db.String(20), nullable=False)
     symptomVerify = db.Column(db.Boolean, nullable=False)
     symptomTime = db.Column(db.String(20), nullable=False)
@@ -208,6 +208,14 @@ def get_user(_id):
 def get_clock_in(_id):
     clock = Clock.query.filter_by(user_id=_id).first()
     return clock
+
+def update_clock(new_clock):
+    old_c = get_clock_in(new_clock.user_id)
+    if old_c != None:
+        db.session.delete(old_c)
+        db.session.commit()
+    db.session.add(new_clock)
+    db.session.commit()
 
 def get_employees(_id):
     users = User.query.filter_by(super_id=_id).all()

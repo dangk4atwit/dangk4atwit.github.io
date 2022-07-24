@@ -1,7 +1,7 @@
 {% extends 'navigation.html' %}
 <html>
     <head>
-        {% block title %}{{form.firstName}}'s Dashboard{% endblock %}  
+        {% block title %}{{current_user.fname}}'s Dashboard{% endblock %}  
         {% block stylesheet %}
           <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
         {% endblock stylesheet %}
@@ -9,14 +9,70 @@
     {% block content %}
     <div id='center' class="main center">
       <div class="mainInner">
-        <div>Dashboard Content</div>
-      </div>
-      <div class="mainInner">
-        <div>Dashboard Content</div>
-      </div>
-      <div class="mainInner">
-        <div>Dashboard Content</div>
+          {% if curr_org.checkMask or curr_org.checkSymptom %}
+            <div class="card verify">
+              <form method="POST" activity="">
+                {{ form.hidden_tag() }} 
+                
+                {% if verified %}
+                  <div class="verBack green">
+                    <label>{{nowDate}}</label>
+                    <label>{{nowTime}}</label>
+                    {{form.refresh}}
+                    <label>Verified</label>
+                    <br><label>{{nowDate}}</label>
+                    <br><label>{{nowTime}}</label>
+                    
+                  </div>
+                {% else %}
+                  <div class="verBack red">
+                    {{form.refresh}}
+                    <div class="cardTop"><label class="cardHead">Not Verified</label></div>
+                    <div class= "itemHeader">
+                      {% if curr_org.checkMask %}
+                        <p>Mask Check</p>
+                      {% endif %}
+                      {% if curr_org.checkSymptom %}
+                        <p>Submit Symptom</p>
+                      {% endif %}
+                    </div>
+                    <div class="itemBody">
+                      {% if curr_org.checkMask %}
+                        {% if verify.maskVerify %}
+                          <p>Completed</p>
+                        {% else %}
+                          <p>{{form.toMask}}</p>
+                        {% endif %}
+                      {% endif %}
+                      {% if curr_org.checkSymptom %}
+                        {% if verify.symptomVerify%}
+                          <p>Completed</p>
+                        {% else %}
+                          <p>{{form.toSymptom}}</p>
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              </form>
+            </div>
+          {% endif %}
+          {% if curr_org.checkTimecard %}
+            <div class="card clock">
+              <div class="cardFiller">
+                <form method="POST" activity="">
+                  {{ form.hidden_tag() }} 
+                  {% if not clocked %}
+                    {{form.clockIn(class="clockBtn")}}
+                  {% else %}
+                    {{form.clockOut(class="clockBtn")}}
+                    <br><Label>Clock In Time : {{form.lastClockIn}}</label>
+                  {% endif %}
+                </form>
+              </div>
+            </div>
+          {% endif %}
       </div>
     </div>
-    {% endblock %}
+    {% endblock content%}
 </html>

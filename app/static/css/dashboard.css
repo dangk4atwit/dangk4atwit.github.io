@@ -11,15 +11,125 @@
     background-color: var(--black);
 }
 .mainInner{
-    display: table;
-    height: 100%;
+    display:flex;
+    flex-flow:row wrap;
+    min-height: 100%;
     width: 100%;
-    text-align: center;
 }
-.mainInner div{
-    display:table-cell;
-    vertical-align: middle;
-    font-size: 3em;
+
+input[name="refresh"]{
+    top: 20px;
+    right:20px; 
+    position:absolute;
+}
+
+.card{
+    position: relative;
+    margin: 40px;
+    width: 400px;
+    height: 400px;
+    background-color: var(--vanta_black);
+    border-radius: 30px;
+    white-space: nowrap;
+}
+
+.cardHead{
+    font-size: 50;
     font-weight: bold;
-    letter-spacing: 1.25px;
+}
+
+.cardTop {
+    text-align: center;
+    top: 100px;
+    position:absolute;
+    width: 100%;
+}
+
+.verBack {
+    position:absolute;
+    overflow: hidden;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    
+    color: var(--white);
+    height: 90%;
+    width: 90%;
+    border-radius: 30px;
+}
+
+.green{
+    background-color: green;
+}
+
+.red{
+    background-color: red;
+}
+
+.itemHeader{
+    position: absolute;
+    font-size: 20;
+    font-weight: bold;
+    text-align: left;
+    left: 30px;
+    bottom: 0;
+}
+.itemBody{
+    font-size: 20;
+    text-align: right;
+    position: absolute;
+    right: 30px;
+    bottom: 0;
+}
+
+.item{
+    padding-left: 40;
+    width: 100%;
+}
+
+.item div p{
+    margin-bottom: 40px;
+}
+
+.cardFiller{
+    position:absolute;
+    overflow: hidden;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    
+    color: var(--white);
+    height: 90%;
+    width: 90%;
+    border-radius: 30px;
+}
+
+
+.clockBtn {
+    position: absolute;
+    left: 105px;
+    top: 155px;
+
+    width: 150px;  
+    height: 50px;  
+    font-size: 20px;
+    border-radius: 17px;  
+    border-style: none;
+    color: var(--black);  
+    background-color: var(--orange);
+    font-weight: bold;
+}
+.clockBtn:hover{
+    background-color: var(--light_orange);
+}
+.clockBtn:focus{
+    outline-color: transparent;
+    outline-style: solid;
+    box-shadow: 0 0 0 2px var(--dark_orange);
+}
+.clockBtn:active{
+    outline-color: transparent;
+    outline-style:solid;
+    background-color: var(--middle_orange);
+    box-shadow: 0 0 0 2px var(--dark_orange);
 }
