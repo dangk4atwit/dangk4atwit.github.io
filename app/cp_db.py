@@ -145,17 +145,21 @@ db.create_all(bind=['clock'])
 db.session.commit()
 
 class Verify(db.Model, UserMixin):
-    __bind_key__ = 'veify'
+    __bind_key__ = 'verify'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    maskverify = db.Column(db.String(10), nullable=False)
-    symptomverify = db.Column(db.Boolean, nullable=False)
+    maskVerify = db.Column(db.String(10), nullable=False)
+    maskTime = db.Column(db.String(20), nullable=False)
+    symptomVerify = db.Column(db.Boolean, nullable=False)
+    symptomTime = db.Column(db.String(20), nullable=False)
     info={'bind_key':'verify'}
     
-    def __init__(self, user_id, maskverify, symptomverify):
+    def __init__(self, user_id, maskVerify, maskTime, symptomVerify, symptomTime):
         self.user_id = user_id
-        self.maskverify = maskverify
-        self.symptomverify = symptomverify
+        self.maskVerify = maskVerify
+        self.maskTime = maskTime
+        self.symptomVerify = symptomVerify
+        self.symptomTime = symptomTime
 
 
 db.create_all(bind=['verify'])
@@ -165,6 +169,14 @@ def get_verify(_id):
     verify=Verify.query.filter_by(user_id=_id).first()
     return verify
 
+def update_verify(new_verify):
+    old_verify = get_verify(new_verify.user_id)
+    if old_verify != None:
+        db.session.delete(old_verify)
+        db.session.commit()
+    db.session.add(new_verify)
+    db.session.commit()
+    
 def get_org(_id):
     org = Org.query.filter_by(orgid=_id).first()
     return org

@@ -2,17 +2,15 @@ from audioop import add
 from enum import unique
 from turtle import width
 from typing import Any
-from cp_db import User, Org, Time, Clock, Verify, app, db, get_verify, get_org, get_time, get_user, get_clock_in, update_time, update_org, get_employee_submitted_timecards
+from cp_db import User, Org, Time, Clock, Verify, app, db, get_verify, get_org, get_time, get_user,get_clock_in, update_time, update_org, get_employee_submitted_timecards, update_verify
 import bcrypt
 from flask import render_template, url_for, redirect, abort, flash, request, session, Response
 from flask_login import login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
-from flask_wtf.csrf import CSRFError
-from werkzeug.datastructures import MultiDict
 from flask_navigation import Navigation
 from platformdirs import user_runtime_path
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, FloatField
-from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange, AnyOf
+from wtforms.validators import InputRequired, Length, ValidationError, EqualTo, NumberRange
 from flask_bcrypt import Bcrypt
 import phonenumbers
 from datetime import datetime, timedelta, timezone
@@ -26,14 +24,15 @@ from PIL import Image, ImageOps
 import numpy as np
 import pickle
 from keras import backend as K
-from tensorflow import Graph, Session
+import tensorflow as tf
+from tensorflow import Graph
 
 def join(source_dir, dest_file, read_size):
     # Create a new destination file
     output_file = open(dest_file, 'wb')
 
     # Get a list of the file parts
-    parts = ['final_model1', 'final_model2', 'final_model3']
+    parts = ['keras_model.h5']
 
     # Go through each portion one by one
     for file in parts:
@@ -42,7 +41,7 @@ def join(source_dir, dest_file, read_size):
         path = file
 
         # Open the part
-        input_file = open(path, 'rb')
+        input_file = open(source_dir + path, 'rb')
 
         while True:
             # Read all bytes of the part
@@ -62,7 +61,7 @@ def join(source_dir, dest_file, read_size):
     output_file.close()
 
 
-join(source_dir='', dest_file="Combined_Model.p", read_size=50000000)
+#join(source_dir='app/', dest_file="Combined_Model.p", read_size=50000000)
 
 
 classifier=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -71,10 +70,10 @@ labels_dict={0:'mask',1:'no mask'}
 color_dict={0:(0,255,0),1:(0,0,255)}
 global loaded_model
 graph1 = Graph()
-with graph1.as_default():
-	session1 = Session(graph=graph1)
-	with session1.as_default():
-		loaded_model = pickle.load(open('Combined_Model.p', 'rb'))
+# with graph1.as_default():
+# 	session1 = tf.compat.v1.Session(graph=graph1)
+# 	with session1.as_default():
+# 		loaded_model = pickle.load(open('Combined_Model.p', 'rb'))
 
 class VideoCamera(object):
     def __init__(self):
@@ -350,7 +349,7 @@ def calculateTotalHours():
             totalMinutes += int(HM[1])
     totalHours += int(totalMinutes/60)
     totalMinutes = totalMinutes % 60
-    if totalMinutes == 0:
+    if totalMinutes < 10:
         return ":".join([str(totalHours),"0" + str(totalMinutes)])
     return ":".join([str(totalHours),str(totalMinutes)])
         
@@ -444,7 +443,82 @@ def isClockedIn():
     elif c.clocked_out:
         return False
     return True
-        
+
+def newVerify(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newV = Verify(_id, False, "None", False, "None")
+        update_verify(newV)
+    
+
+def checkSymptomVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    if verify.symptomVerify:
+        if verify.symptomTime == "None":
+            return False
+        symptomTime = datetime.strptime(verify.symptomTime, '%m/%d/%Y|%H:%M')
+        symptomTime = symptomTime.astimezone(LOCAL_TIMEZONE)
+        now = datetime.now(LOCAL_TIMEZONE)
+        if now - timedelta(days=1) > symptomTime:
+            return False
+        return True
+    return False
+
+def checkMaskVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    if verify.maskVerify:
+        if verify.maskTime == "None":
+            return False
+        maskTime = datetime.strptime(verify.maskTime, '%m/%d/%Y|%H:%M')
+        maskTime = maskTime.astimezone(LOCAL_TIMEZONE)
+        now = datetime.now(LOCAL_TIMEZONE)
+        if now - timedelta(days=1) > maskTime:
+            return False
+        return True
+    return False
+
+def checkVerified(_id):
+    verify = get_verify(_id)
+    if verify == None:
+        newVerify(_id)
+        return False
+    curr_org = get_org(current_user.orga_id)
+    if curr_org == None:
+        return False
+    verifiedArr = []
+    if curr_org.checkMask:
+        verifiedArr.append(checkMaskVerified(_id))
+    if curr_org.checkSymptom:
+        verifiedArr.append(checkSymptomVerified(_id))
+    return all(x for x in verifiedArr)
+    
+
+def submitSymptom(_id, hasSymp):
+    now = datetime.now(LOCAL_TIMEZONE)
+    newSympTime = now.strftime('%m/%d/%Y|%H:%M')
+    old_verify = get_verify(_id)
+    if old_verify == None:
+        newVerify(_id)
+        old_verify = get_verify(_id)
+    new_verify = Verify(_id, old_verify.maskVerify, old_verify.maskTime, not hasSymp, newSympTime)
+    update_verify(new_verify)
+    
+
+def submitMask(_id, hasMask):
+    now = datetime.now(LOCAL_TIMEZONE)
+    newMaskTime = now.strftime('%m/%d/%Y|%H:%M')
+    if old_verify == None:
+        newVerify(_id)
+        old_verify = get_verify(_id)
+    new_verify = Verify(_id, not hasMask, newMaskTime, old_verify.symptomVerify, old_verify.symptomTime)
+    update_verify(new_verify)
+    
 ####################################################            FORMS & PAGES              #################################################################################
 
 
@@ -786,13 +860,23 @@ def video():
     return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
+    symptoms= ["Fever", "Chills", "Cough", "Difficulty Breathing", "Fatigue", "Muscle Aches",
+              "Headache", "Loss of Taste or Smell", "Sore Throat", "Congestion or Runny Nose",
+              "Nausea or Vomiting", "Diarrhea", "Pain, Swelling or Rash on Toes or Fingers"]
+    noSymp = SubmitField("No Symptoms")
     submit = SubmitField("Submit Symptoms")
     
 @app.route('/symptom_check', methods=['GET', 'POST'])
 @login_required
 def symptom_check():
     form = SymptomCheckForm()
+    
     if form.validate_on_submit():
+        if form.noSymp.data:
+            submitSymptom(current_user.workId, False)
+        sympArr = request.form.getlist('symptom')
+        if len(sympArr) > 0:
+            submitSymptom(current_user.workId, True)
         return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('symptom_check.html', form=form)

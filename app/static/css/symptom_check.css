@@ -2,25 +2,55 @@
 
 .main {
     margin: 0 auto;
-    display: block;
-    height: 100%;
+    height: fit-content;
+    width: 1500;
     margin-top: 60px;
-    background-color: var(--black);
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    position: relative;
 }
-.mainInner {
-    background-color: var(--black);
-    color: var(--white);
-}
+
 .mainInner{
-    display: table;
+    color: var(--white);
+    background-color: var(--black);
     height: 100%;
     width: 100%;
-    text-align: center;
+    display:flex;
+    flex-direction:column;
 }
-.mainInner div{
-    display:table-cell;
-    vertical-align: middle;
-    font-size: 3em;
+
+.card{
+    margin:40px auto;
+    width: 1200px;
+    height: fit-content;
+    background-color: var(--vanta_black);
+    border-radius: 30px;
+    padding-bottom: 60px;
+    bottom: 60px;
+    position: relative;
+}
+
+.contentTitle{
+    color: var(--orange);
+    text-align: left;
+    padding: 40px;
+    font-size: 40;
+}
+
+.itemContent{
+    height: fit-content;
+    font-size: 20;
     font-weight: bold;
-    letter-spacing: 1.25px;
+    text-align: left;
+    float: left;
+}
+
+.item{
+    display: grid;
+    place-content: center;
+    min-height: 20%;
+    padding-left: 40;
+    margin-bottom: 40px;
+    width: 100%;
 }

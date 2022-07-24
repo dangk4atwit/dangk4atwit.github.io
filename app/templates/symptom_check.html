@@ -11,8 +11,18 @@
       <div class="mainInner">
         <div>Symptom Content</div>
         <form method="POST" action="">
-          {{ form.hidden_tag() }} 
-          {{form.submit}}
+          {{ form.hidden_tag() }}
+          <div class="card symptoms">
+            <div class= "contentTitle">Submit Symptoms</div>
+            <div class="item">
+              <div class= "itemContent">
+                {% for symp in form.symptoms %}
+                  <br><input type="checkbox" id="{{symp}}" name="symptom"><label for="{{symp}}">{{symp}}</label></input>
+                {% endfor %}
+              </div>
+            </div>
+            {{form.submit}}{{form.noSymp}}
+          </div>
         </form>
       </div>
     </div>
