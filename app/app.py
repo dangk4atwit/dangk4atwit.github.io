@@ -60,7 +60,7 @@ def maskverify():
         frame = cv2.rectangle(frame, (220, 80), (530, 360), (0, 0, 255), 3)
         # Draw rectangle in which the image to labelled is to be shown.
         frame2 = frame[80:360, 220:530]
-        # resize the image to a 224x224 with the same strategy as in TM2:
+        # resize the image to a 224x224
         # resizing the image to be at least 224x224 and then cropping from the center
         frame2 = cv2.resize(frame2, (224, 224))
         # turn the image into a numpy array
