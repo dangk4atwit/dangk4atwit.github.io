@@ -19,95 +19,76 @@ import cv2
 
 ##################################################  CAMERA   #####################################################
 
-from keras.models import load_model
+import tensorflow.python.keras
 from PIL import Image, ImageOps
 import numpy as np
-import pickle
-from keras import backend as K
-import tensorflow as tf
-from tensorflow import Graph
-
-def join(source_dir, dest_file, read_size):
-    # Create a new destination file
-    output_file = open(dest_file, 'wb')
-
-    # Get a list of the file parts
-    parts = ['keras_model.h5']
-
-    # Go through each portion one by one
-    for file in parts:
-
-        # Assemble the full path to the file
-        path = file
-
-        # Open the part
-        input_file = open(source_dir + path, 'rb')
-
-        while True:
-            # Read all bytes of the part
-            bytes = input_file.read(read_size)
-
-            # Break out of loop if we are at end of file
-            if not bytes:
-                break
-
-            # Write the bytes to the output file
-            output_file.write(bytes)
-
-        # Close the input file
-        input_file.close()
-
-    # Close the output file
-    output_file.close()
 
 
-#join(source_dir='app/', dest_file="Combined_Model.p", read_size=50000000)
+def gen_labels():
+        labels = {}
+        with open("app/labels.txt", "r") as label:
+            text = label.read()
+            lines = text.split("\n")
+            print(lines)
+            for line in lines[0:-1]:
+                    hold = line.split(" ", 1)
+                    labels[hold[0]] = hold[1]
+        return labels
 
+def maskverify():
+    # Disable scientific notation for clarity
+    np.set_printoptions(suppress=True)
+    image = cv2.VideoCapture(0)
+    # Loading the model
+    model = tensorflow.keras.models.load_model('app/keras_model.h5')
 
-classifier=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-size = 4
-labels_dict={0:'mask',1:'no mask'}
-color_dict={0:(0,255,0),1:(0,0,255)}
-global loaded_model
-graph1 = Graph()
-# with graph1.as_default():
-# 	session1 = tf.compat.v1.Session(graph=graph1)
-# 	with session1.as_default():
-# 		loaded_model = pickle.load(open('Combined_Model.p', 'rb'))
+    """
+    Create the array of the right shape to feed into the keras model
+    The 'length' or number of images you can put into the array is
+    determined by the first position in the shape tuple, in this case 1."""
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    # A dict that stores the labels
+    labels = gen_labels()
 
-class VideoCamera(object):
-    def __init__(self):
-        self.video = cv2.VideoCapture(0)
-    
-    def __del__(self):
-        self.video.release()
-    
-    def get_frame(self):
-        (rval, im) = self.video.read()
-        im = cv2.flip(im, 1, 1)
-        mini = cv2.resize(im, (im.shape[1] // size, im.shape[0] // size))
-        faces = classifier.detectMultiScale(mini)
-        for f in faces:
-            (x, y, w, h) = [v * size for v in f] 
-            face_img = im[y:y+h, x:x+w]
-            resized=cv2.resize(face_img,(300,300))
-            normalized=resized/255.0
-            reshaped=np.reshape(normalized,(1,300,300,3))
-            reshaped = np.vstack([reshaped])
-            K.set_session(session1)
-            with graph1.as_default():
-                results=loaded_model.predict(reshaped)
-            if results >.5:
-                result = np.array([[1]])
-            else:
-                result = np.array([[0]])
-            label = np.argmax(result)
-            cv2.rectangle(im,(x,y),(x+w,y+h),color_dict[result[label][0]],2)
-            cv2.rectangle(im,(x,y-40),(x+w,y),color_dict[result[label][0]],-1)
-            cv2.putText(im, labels_dict[result[label][0]], (x, y-10),cv2.FONT_HERSHEY_SIMPLEX,0.8,(255,255,255),2)
-            
-        ret, jpeg = cv2.imencode('.jpg', im)
-        return jpeg.tobytes()
+    while True:
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        ret, frame = image.read()
+        frame = cv2.flip(frame, 1)
+        if not ret:
+            continue
+        # Draw a rectangle, in the frame
+        frame = cv2.rectangle(frame, (220, 80), (530, 360), (0, 0, 255), 3)
+        # Draw rectangle in which the image to labelled is to be shown.
+        frame2 = frame[80:360, 220:530]
+        # resize the image to a 224x224 with the same strategy as in TM2:
+        # resizing the image to be at least 224x224 and then cropping from the center
+        frame2 = cv2.resize(frame2, (224, 224))
+        # turn the image into a numpy array
+        image_array = np.asarray(frame2)
+        # Normalize the image
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        # Load the image into the array
+        data[0] = normalized_image_array
+        pred = model.predict(data)
+        result = np.argmax(pred[0])
+        ret, buffer=cv2.imencode('.jpg',frame)
+        frame=buffer.tobytes()
+        yield(b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        # Print the predicted label into the screen.
+        cv2.putText(frame,  "Label : " +
+                    labels[str(result)], (280, 400), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+        if cv2.waitKey(1):
+            exit = True
+            break
+
+        cv2.imshow('Frame', frame)
+
+    image.release()
+    cv2.destroyAllWindows()
+
 
 
 def gen(camera):
@@ -914,7 +895,7 @@ def mask_verify():
 @app.route('/video')
 @login_required
 def video():
-    return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(maskverify(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
     symptoms= ["Fever", "Chills", "Cough", "Difficulty Breathing", "Fatigue", "Muscle Aches",
