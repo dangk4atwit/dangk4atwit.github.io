@@ -91,6 +91,14 @@ input[name="refresh"]{
     margin-bottom: 40px;
 }
 
+.clockLabel{
+    position: absolute;
+    bottom: 80px;
+    left: 30px;
+    font-weight: bold;
+    font-size: 20;
+}
+
 .cardFiller{
     position:absolute;
     overflow: hidden;
