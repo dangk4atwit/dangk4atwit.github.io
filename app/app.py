@@ -376,19 +376,16 @@ def clock_out(sunday):
 
     if "bi" in current_user.payInt.lower():
         if (now - sunday).days > 14:
-            session.pop("curr_timecard_index")
             newC = Clock(current_user.workId, c.clock_in, True)
             update_clock(newC)
             return
     else:
         if (now - sunday).days > 7:
-            session.pop("curr_timecard_index")
             newC = Clock(current_user.workId, c.clock_in, True)
             update_clock(newC)
             return
     
     if sunday > inTime:
-        session.pop("curr_timecard_index")
         newC = Clock(current_user.workId, c.clock_in, True)
         update_clock(newC)
         return
