@@ -1,0 +1,14 @@
+tensorflow
+flask
+flask_sqlalchemy
+sqlalchemy
+flask_login
+python-opencv
+pillow
+numpy
+flask_bcrypt
+wtforms
+flask_wtf
+flask_navigation
+platformdirs
+keras
