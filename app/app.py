@@ -26,6 +26,7 @@ import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
+results = {};
 
 def gen_labels():
         labels = {}
@@ -38,12 +39,13 @@ def gen_labels():
         return labels
 
 
-def maskverify():
+def maskverify(_id):
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
     # Loading the model
     model = tensorflow.keras.models.load_model('app/keras_model.h5', compile=False)
-    result = 0;
+    global results
+    result = 0
     """
     Create the array of the right shape to feed into the keras model
     The 'length' or number of images you can put into the array is
@@ -59,7 +61,6 @@ def maskverify():
                 break
             else:
     
-                font = cv2.FONT_HERSHEY_SIMPLEX
                 # Draw a rectangle, in the frame
                 if result == 0:
                     color = (0,255,0)
@@ -80,14 +81,14 @@ def maskverify():
                 pred = model.predict(data, verbose = 0)
                 result = np.argmax(pred[0])
                 
+                results[_id] = result
+                
                 ret, frame=cv2.imencode('.jpg',frame)
                 frame=frame.tobytes()
                 yield(b'--frame\r\n'
                          b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     finally:
         camera.release()
-    # image.release()
-    # cv2.destroyAllWindows()
 
 
 
@@ -443,6 +444,7 @@ def submitSymptom(_id, hasSymp):
 def submitMask(_id, hasMask):
     now = datetime.now(LOCAL_TIMEZONE)
     newMaskTime = now.strftime('%m/%d/%Y|%H:%M')
+    old_verify = get_verify(_id)
     if old_verify == None:
         newVerify(_id)
         old_verify = get_verify(_id)
@@ -888,6 +890,10 @@ class MaskVerifyForm(FlaskForm):
 def mask_verify():
     form = MaskVerifyForm()
     if form.validate_on_submit():
+        global results
+        result = results.get(current_user.workId, None)
+        submitMask(current_user.workId, not (result == 0))
+        results.pop(current_user.workId)
         return redirect(url_for('dashboard'))
     adaptNav()
     return render_template('mask_verify.html', form=form)
@@ -895,7 +901,7 @@ def mask_verify():
 @app.route('/video')
 @login_required
 def video():
-    return Response(maskverify(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(maskverify(current_user.workId), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 class SymptomCheckForm(FlaskForm):
     symptoms= ["Fever", "Chills", "Cough", "Difficulty Breathing", "Fatigue", "Muscle Aches",
