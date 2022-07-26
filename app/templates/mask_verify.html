@@ -7,16 +7,13 @@
         {% endblock stylesheet %}
     </head>
     {% block content %}
-    <div id='center' class="main center">
-      <div class="mainInner">
-      <body>
-          <div>
-            <img src="{{ url_for('video') }}" width="50%"/>
-            <form method="POST" action="">
-              {{ form.hidden_tag() }} 
-              {{form.submit}}
-            </form>
-          </div>
+      <div id='center' class="main center">
+        <div class="mainInner">
+          <div class="videoWindow"><img class="camera" src="{{ url_for('video') }}"/></div>
+          <form method="POST" action="" class="submitForm">
+            {{ form.hidden_tag() }} 
+            {{form.submit}}
+          </form>
         </div>
       </div>
     {% endblock %}

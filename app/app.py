@@ -38,6 +38,27 @@ def gen_labels():
                     labels[hold[0]] = hold[1]
         return labels
 
+# http://stackoverflow.com/questions/46036477/drawing-fancy-rectangle-around-face
+def draw_border(img, pt1, pt2, color, thickness, r, d):
+    x1,y1 = pt1
+    x2,y2 = pt2
+    # Top left
+    img = cv2.line(img, (x1 + r, y1), (x1 + r + d, y1), color, thickness)
+    img = cv2.line(img, (x1, y1 + r), (x1, y1 + r + d), color, thickness)
+    img = cv2.ellipse(img, (x1 + r, y1 + r), (r, r), 180, 0, 90, color, thickness)
+    # Top right
+    img = cv2.line(img, (x2 - r, y1), (x2 - r - d, y1), color, thickness)
+    img = cv2.line(img, (x2, y1 + r), (x2, y1 + r + d), color, thickness)
+    img = cv2.ellipse(img, (x2 - r, y1 + r), (r, r), 270, 0, 90, color, thickness)
+    # Bottom left
+    img = cv2.line(img, (x1 + r, y2), (x1 + r + d, y2), color, thickness)
+    img = cv2.line(img, (x1, y2 - r), (x1, y2 - r - d), color, thickness)
+    img = cv2.ellipse(img, (x1 + r, y2 - r), (r, r), 90, 0, 90, color, thickness)
+    # Bottom right
+    img = cv2.line(img, (x2 - r, y2), (x2 - r - d, y2), color, thickness)
+    img = cv2.line(img, (x2, y2 - r), (x2, y2 - r - d), color, thickness)
+    img = cv2.ellipse(img, (x2 - r, y2 - r), (r, r), 0, 0, 90, color, thickness)
+    return img
 
 def maskverify(_id):
     # Disable scientific notation for clarity
@@ -66,7 +87,9 @@ def maskverify(_id):
                     color = (0,255,0)
                 else:
                     color = (0,0,255)
-                frame = cv2.rectangle(frame, (60, 60), (600, 450), color, 3)
+                frame = draw_border(frame, (140, 80), (500, 370), color, 3, 15, 50)
+                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
+                
                 # Draw rectangle in which the image to labelled is to be shown.
                 frame2 = frame[80:360, 220:530]
                 # resize the image to a 224x224
