@@ -373,21 +373,24 @@ def clock_out(sunday):
     inTime = datetime.strptime(c.clock_in, '%m/%d/%Y|%H:%M')
     inTime = inTime.astimezone(LOCAL_TIMEZONE)
     now = datetime.now(LOCAL_TIMEZONE)
-    
+
     if "bi" in current_user.payInt.lower():
-        if (sunday - now).days > 14:
+        if (now - sunday).days > 14:
             session.pop("curr_timecard_index")
             newC = Clock(current_user.workId, c.clock_in, True)
             update_clock(newC)
             return
     else:
-        if (sunday - now).days > 7:
+        if (now - sunday).days > 7:
             session.pop("curr_timecard_index")
             newC = Clock(current_user.workId, c.clock_in, True)
             update_clock(newC)
             return
     
     if sunday > inTime:
+        session.pop("curr_timecard_index")
+        newC = Clock(current_user.workId, c.clock_in, True)
+        update_clock(newC)
         return
     
     nextDate = inTime
