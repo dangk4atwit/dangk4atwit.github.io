@@ -12,11 +12,11 @@
       <body>
           <div>
             <img src="{{ url_for('video') }}" width="50%"/>
+            <form method="POST" action="">
+              {{ form.hidden_tag() }} 
+              {{form.submit}}
+            </form>
           </div>
-          <form method="POST" action="">
-            {{ form.hidden_tag() }} 
-            {{form.submit}}
-          </form>
         </div>
       </div>
     {% endblock %}
