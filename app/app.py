@@ -32,7 +32,6 @@ def gen_labels():
         with open("app/labels.txt", "r") as label:
             text = label.read()
             lines = text.split("\n")
-            print(lines)
             for line in lines[0:-1]:
                     hold = line.split(" ", 1)
                     labels[hold[0]] = hold[1]
@@ -42,10 +41,9 @@ def gen_labels():
 def maskverify():
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
-    image = cv2.VideoCapture(0)
     # Loading the model
     model = tensorflow.keras.models.load_model('app/keras_model.h5', compile=False)
-
+    result = 0;
     """
     Create the array of the right shape to feed into the keras model
     The 'length' or number of images you can put into the array is
@@ -62,12 +60,12 @@ def maskverify():
             else:
     
                 font = cv2.FONT_HERSHEY_SIMPLEX
-                ret, frame = image.read()
-                frame = cv2.flip(frame, 1)
-                if not ret:
-                    continue
                 # Draw a rectangle, in the frame
-                frame = cv2.rectangle(frame, (220, 80), (530, 360), (0, 0, 255), 3)
+                if result == 0:
+                    color = (0,255,0)
+                else:
+                    color = (0,0,255)
+                frame = cv2.rectangle(frame, (220, 80), (530, 360), color, 3)
                 # Draw rectangle in which the image to labelled is to be shown.
                 frame2 = frame[80:360, 220:530]
                 # resize the image to a 224x224
@@ -79,21 +77,13 @@ def maskverify():
                 normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
                 # Load the image into the array
                 data[0] = normalized_image_array
-                pred = model.predict(data)
+                pred = model.predict(data, verbose = 0)
                 result = np.argmax(pred[0])
-                ret, buffer=cv2.imencode('.jpg',frame)
-                frame=buffer.tobytes()
+                
+                ret, frame=cv2.imencode('.jpg',frame)
+                frame=frame.tobytes()
                 yield(b'--frame\r\n'
-                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-                # Print the predicted label into the screen.
-                cv2.putText(frame,  "Label : " + labels[str(result)], (280, 400), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-
-                if cv2.waitKey(1):
-                    exit = True
-                    break
-
-                cv2.imshow('Frame', frame)
+                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     finally:
         camera.release()
     # image.release()
