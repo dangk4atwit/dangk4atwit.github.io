@@ -83,7 +83,7 @@ def maskverify(_id):
             else:
     
                 # Draw a rectangle, in the frame
-                if result == 0:
+                if result == 1:
                     color = (0,255,0)
                 else:
                     color = (0,0,255)
@@ -917,7 +917,7 @@ def mask_verify():
     if form.validate_on_submit():
         global results
         result = results.get(current_user.workId, None)
-        submitMask(current_user.workId, not (result == 0))
+        submitMask(current_user.workId, not (result == 1))
         results.pop(current_user.workId)
         return redirect(url_for('dashboard'))
     adaptNav()
