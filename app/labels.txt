@@ -1,2 +1,2 @@
-0 Mask
-1 No_Mask
+0 No_Mask
+1 Mask
