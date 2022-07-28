@@ -26,7 +26,7 @@ import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-results = {};
+results = {}
 
 def gen_labels():
         labels = {}
@@ -87,11 +87,13 @@ def maskverify(_id):
                     color = (0,255,0)
                 else:
                     color = (0,0,255)
-                frame = draw_border(frame, (140, 80), (500, 370), color, 3, 15, 50)
-                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
                 
                 # Draw rectangle in which the image to labelled is to be shown.
-                frame2 = frame[80:360, 220:530]
+                frame2 = frame[160:480, 80:370]
+                
+                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
+                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
+                
                 # resize the image to a 224x224
                 # resizing the image to be at least 224x224 and then cropping from the center
                 frame2 = cv2.resize(frame2, (224, 224))
