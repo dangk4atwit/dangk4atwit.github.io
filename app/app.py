@@ -462,6 +462,8 @@ def submitSymptom(_id, hasSymp):
     if old_verify == None:
         newVerify(_id)
         old_verify = get_verify(_id)
+    if hasSymp and hasSymp == old_verify.symptomVerify:
+        newSympTime = old_verify.symptomTime
     new_verify = Verify(_id, old_verify.maskVerify, old_verify.maskTime, not hasSymp, newSympTime)
     update_verify(new_verify)
     
@@ -473,7 +475,9 @@ def submitMask(_id, hasMask):
     if old_verify == None:
         newVerify(_id)
         old_verify = get_verify(_id)
-    new_verify = Verify(_id, not hasMask, newMaskTime, old_verify.symptomVerify, old_verify.symptomTime)
+    if not hasMask and hasMask == old_verify.maskVerify:
+        newMaskTime = old_verify.maskTime
+    new_verify = Verify(_id, hasMask, newMaskTime, old_verify.symptomVerify, old_verify.symptomTime)
     update_verify(new_verify)
     
 
