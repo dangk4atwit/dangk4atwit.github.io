@@ -888,9 +888,12 @@ def timecard_modal():
     adaptNav()
     weeks=getWeeks(current_user)
     if "bi" in current_user.payInt.lower():
-        dayVals = getListOfDayVals(weeks*7, determineBiweeklyStart())
+        startDate = determineBiweeklyStart()
+        dayVals = getListOfDayVals(weeks*7, startDate)
     else:
-        dayVals = getListOfDayVals(weeks*7, getLastSunday())
+        startDate = getLastSunday()
+        dayVals = getListOfDayVals(weeks*7, startDate)
+    selectedDate = (startDate + timedelta(days=curr_timecard_index)).strftime('%m/%d/%Y')
     curr_timecard_hours = session.get("curr_timecard_hours", None)
     if curr_timecard_hours == None:
         return redirect(url_for('timecard'))
@@ -909,7 +912,7 @@ def timecard_modal():
         session.pop("curr_timecard_index")
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
+    return render_template('tc-modal.html', form=form, date=selectedDate, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 class MaskVerifyForm(FlaskForm):
     submit = SubmitField("Submit Mask Verification")
