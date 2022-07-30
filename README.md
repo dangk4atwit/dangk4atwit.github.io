@@ -2,7 +2,7 @@
 # Requirements
 - Any version of Python 3.8. (Anything higher will not work. Unsure how low you can go.)
 - Install pip.
-- Install all the libraries from [requirements.txt](./requirements.txt).
+- Use pip to install all of the libraries from [requirements.txt](./requirements.txt).
 
 # Usage Instructions
 - The entire application can be found within the [app](./app) folder.
