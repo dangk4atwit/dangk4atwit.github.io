@@ -7,7 +7,7 @@
 # Usage Instructions
 - The entire application can be found within the [app](./app) folder.
 - Run [app.py](./app/app.py) and wait for flask webpage to host. 
-- Open http://127.0.0.1:5000/ to access to website.
+- Enter the URL http://127.0.0.1:5000/ into your browser to gain access to the website.
 - The Available accounts are as follows **(CASE SENSITIVE)**:
     - Username: **admin**, Password: **admin** | Manager Account
     - Username: **user**, Password: **user** | Employee Account
@@ -17,7 +17,7 @@
 - Organization login information is as follows **(CASE SENSITIVE)**:
   - Username: **checkpoint**, Password: **checkpoint** | Manager Account
 - **Logout** button can be found within the hamburger menu in the top right of the website. 
-- **IMPORTANT: LOGOUT BEFORE LOGGING INTO ANY OTHER ACCOUNT**
+- **IMPORTANT: LOGOUT BEFORE LOGGING INTO ANY OTHER ACCOUNT!!!**
 # Abstract
 In recent years, the Coronavirus disease has slowed the progression of most organizations. While many people are eager to return to how things were before the pandemic, it is more important than ever to keep in mind the health and safety of others. With businesses ramping back up, there is a need of urgency to be efficient due to the time lost during the pandemic’s peak. All organizations have a method of tracking their employees, but the process could be more unified and efficient.​
 
