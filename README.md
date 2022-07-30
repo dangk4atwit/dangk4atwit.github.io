@@ -1,6 +1,6 @@
 ![CheckPoint](./app/static/images/icons/Checkpoint_Logo_Large.png)
 # Requirements
-- Python 3.8 or lower.
+- Any version of Python 3.8. (Anything higher will not work. Unsure how low you can go.)
 - Install pip.
 - Install all the libraries from [requirements.txt](./requirements.txt).
 
