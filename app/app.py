@@ -383,18 +383,18 @@ def clock_out(sunday):
         return
     
     nextDate = inTime
-    daysDifference = (inTime - now).days
+    daysDifference = (now - inTime).days
     if daysDifference > 0:
         for i in range(daysDifference + 1):
             nextDate = nextDate + timedelta(days=1)
             if i == 0:
                 session["curr_timecard_index"] = (inTime - sunday).days
-                inputHours = seconds_to_hours_string((inTime - nextDate).total_seconds())
+                inputHours = seconds_to_hours_string((nextDate - inTime).total_seconds())
                 addTimecardHour(inputHours)
                 nextDate = nextDate - timedelta(days=1)
             elif i == daysDifference-1:
                 session["curr_timecard_index"] = (now - sunday).days
-                inputHours = seconds_to_hours_string((nextDate - now).total_seconds())
+                inputHours = seconds_to_hours_string((now - nextDate).total_seconds())
                 addTimecardHour(inputHours)
             else:
                 session["curr_timecard_index"] = (nextDate - sunday).days
