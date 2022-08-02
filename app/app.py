@@ -91,15 +91,17 @@ def maskverify(_id):
                 # Draw rectangle in which the image to labelled is to be shown.
                 frame2 = frame[160:480, 80:370]
                 
-                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
-                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
-                
+                                
                 # resize the image to a 224x224
                 # resizing the image to be at least 224x224 and then cropping from the center
                 frame2 = cv2.resize(frame2, (224, 224))
                 # turn the image into a numpy array
                 image_array = np.asarray(frame2)
                 # Normalize the image
+                
+                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
+                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
+
                 normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
                 # Load the image into the array
                 data[0] = normalized_image_array
@@ -122,41 +124,6 @@ def gen(camera):
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-
-
-# def gen_frames():
-#     try:
-#         camera = cv2.VideoCapture(0)
-#         while True:
-#             success, frame=camera.read()
-#             if not success:
-#                 break
-#             else:
-#                 face_detect=cv2.CascadeClassifier('app/Haarcascades/haarcascade_frontalface_default.xml')
-#                 eye_detect = cv2.CascadeClassifier('app/Haarcascades/haarcascade_eye.xml')
-#                 mouth_detect = cv2.CascadeClassifier('app/Haarcascades/jaarcascade_smile.xml')
-#                 faces=face_detect.detectMultiScale(frame,1.3, 7)
-#                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#                     #drawing the outline box to look for face features
-#                 for (x, y, w, h) in faces:
-#                     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 3)
-#                     roi_gray = gray[x:x+w, y:y+w]
-#                     roi_color = frame[x:x+w, y:y+h]
-#                     eyes = eye_detect.detectMultiScale(roi_gray, 1.3, 7)
-#                     mouth = mouth_detect.detectMultiScale(frame, 1.3, 7)
-#                     for (ex, ey, ew, eh) in eyes:
-#                         cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 3)
-#                     for (mx, my, mw, mh) in mouth:
-#                         #my=int(my-0.15*mh)
-#                         cv2.rectangle(roi_color, (mx, my), (mx+mw, my+mh), (0, 255, 0), 3)
-
-#                 ret, buffer=cv2.imencode('.jpg',frame)
-#                 frame=buffer.tobytes()
-#                 yield(b'--frame\r\n'
-#                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-#     finally:
-#         camera.release()
 
 
 
