@@ -771,6 +771,8 @@ def timecard():
     
     total = calculateTotalHours()
     
+    status = get_time(current_user.workId, datetime.strptime(startDate, '%m/%d/%Y|%H:%M')).state
+    
     if form.validate_on_submit():
         if form.saveDraft.data:
             saveTimecard(current_user.workId, startDate, "none")
@@ -785,7 +787,7 @@ def timecard():
         session.pop("curr_timecard_hours")
         return redirect(url_for('timecard'))
     adaptNav()
-    return render_template('timecard.html', form=form, clocked = isClockedIn(), weeks = getWeeks(current_user), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
+    return render_template('timecard.html', form=form, status=status, clocked = isClockedIn(), weeks = getWeeks(current_user), today=datetime.now().day, curr_timecard_hours=curr_timecard_hours, total=total)
 
 
 
@@ -853,6 +855,7 @@ def timecard_modal():
         return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
     adaptNav()
+    status = get_time(current_user.workId, datetime.strptime(startDate, '%m/%d/%Y|%H:%M')).state
     weeks=getWeeks(current_user)
     if "bi" in current_user.payInt.lower():
         startDate = determineBiweeklyStart()
@@ -879,7 +882,7 @@ def timecard_modal():
         session.pop("curr_timecard_index")
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, date=selectedDate, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
+    return render_template('tc-modal.html', form=form, status=status, date=selectedDate, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 class MaskVerifyForm(FlaskForm):
     submit = SubmitField("Submit Mask Verification")

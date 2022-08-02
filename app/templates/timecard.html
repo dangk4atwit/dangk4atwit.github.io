@@ -49,11 +49,15 @@
                             {% endfor %}
                     </table>
                     <div>
-                        <form method="POST" action="">
-                            {{ form.hidden_tag() }}
-                            {{form.saveDraft}}
-                            {{form.submit}}
-                        </form>
+                        {% if status.equals("none") || status.equals("Denied") %}
+                            <form method="POST" action="">
+                                {{ form.hidden_tag() }}
+                                {{form.saveDraft}}
+                                {{form.submit}}
+                            </form>
+                        {% else %}
+                            <div>Timecard Submitted</div>
+                        {% endif %}
                         <div>Total Hours Worked: {{total}}</div>
                     </div>
                 {% endif %}
