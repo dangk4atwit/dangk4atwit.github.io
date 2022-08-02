@@ -6,13 +6,13 @@ In recent years, the Coronavirus disease has slowed the progression of most orga
 The objective of Check Point is to make it, so organizations have a convenient way of tracking their employees (through when clocking in/out, their timecard, checking if an employee is experiencing any symptoms, and mask requirement detection). The result will be a combination of several features from separate services/applications in order to maximize efficiency and minimize costs. We have developed a web-based application that will serve as an efficient work check-in method. The application will come with a variety of features that a manager can customize to best fit their organization. ​
 
 # Features
-## 1. User Login
-## 2. Organization Login
-## 3. User Profile
-## 4. Timecard clock in/out
-## 5. Timecard management
-## 6. Mask Detection
-## 7. Symptom Submission
+1. User Login
+2. Organization Login
+3. User Profile
+4. Timecard clock in/out
+5. Timecard management
+6. Mask Detection
+7. Symptom Submission
 # Getting Started
 ## Requirements
 - Any version of Python 3.8. (Anything higher will not work. Unsure how low you can go.)
