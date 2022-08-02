@@ -35,7 +35,7 @@ The objective of Check Point is to make it, so organizations have a convenient w
   - Username: **checkpoint**, Password: **checkpoint** | Manager Account
 - **Logout** button can be found within the hamburger menu on the top right of the website. 
 # Demo Video
-[![](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=bx9ztb_qo5k)
+[![Demo (Click Me!)](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=bx9ztb_qo5k)
 # Contributers
 - Johnnie Ho (hoj2@wit.edu), Full Stack Developer
 - Kevin Dang (dangk4@wit.edu), Back End, Machine Learning Developer
