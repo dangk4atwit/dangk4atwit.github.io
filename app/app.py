@@ -743,6 +743,7 @@ class TimecardForm(FlaskForm):
     clockOut = SubmitField("Clock Out")
     saveDraft = SubmitField("Save Draft")
     submit = SubmitField("Submit Timecard")
+    refresh = SubmitField("Refresh")
     def __init__(self, amount, sunday, *args, **kwargs):
         super(TimecardForm, self).__init__(*args, **kwargs)
         self.dayVals = getListOfDayVals(amount, sunday)
@@ -763,8 +764,10 @@ def timecard():
         startDate = getLastSunday()
         form = TimecardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
     
-    getTimecardHours(current_user.workId, startDate, form.dayVals)
     curr_timecard_hours = session.get("curr_timecard_hours", None)
+    if curr_timecard_hours == None:
+        getTimecardHours(current_user.workId, startDate, form.dayVals)
+        curr_timecard_hours = session.get("curr_timecard_hours", None)
     
     total = calculateTotalHours()
     
@@ -778,6 +781,8 @@ def timecard():
         elif form.clockOut.data:
             clock_out(startDate)
             saveTimecard(current_user.workId, startDate, "none")
+        elif form.refresh.data:
+            pass
         else:
             saveTimecard(current_user.workId, startDate, "submitted")
             
@@ -890,7 +895,7 @@ def mask_verify():
     if form.validate_on_submit():
         global results
         result = results.get(current_user.workId, None)
-        submitMask(current_user.workId, not (result == 1))
+        submitMask(current_user.workId, result == 1)
         results.pop(current_user.workId)
         return redirect(url_for('dashboard'))
     adaptNav()
