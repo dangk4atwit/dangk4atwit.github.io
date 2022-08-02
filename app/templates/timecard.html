@@ -49,7 +49,7 @@
                             {% endfor %}
                     </table>
                     <div>
-                        {% if status.equals("none") || status.equals("Denied") %}
+                        {% if status =="none" or status == "Denied" %}
                             <form method="POST" action="">
                                 {{ form.hidden_tag() }}
                                 {{form.saveDraft}}

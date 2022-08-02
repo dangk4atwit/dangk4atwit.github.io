@@ -293,7 +293,7 @@ def addTimecardHour(hour):
     total_minute = int(current_time[1]) + int(current_hour[1])
     total_hour = int(current_time[0]) + int(current_hour[0]) + int(int(total_minute)/60)
     total_minute = total_minute % 60
-    if total_hour > 24:
+    if total_hour >= 24:
         setTimecardHour("24:00")
     else:
         if total_minute < 10:
@@ -385,19 +385,27 @@ def clock_out(sunday):
     nextDate = inTime
     daysDifference = (now - inTime).days
     if daysDifference > 0:
-        for i in range(daysDifference + 1):
+        for i in range(daysDifference+1):
             nextDate = nextDate + timedelta(days=1)
             if i == 0:
+                print("start")
                 session["curr_timecard_index"] = (inTime - sunday).days
                 inputHours = seconds_to_hours_string((nextDate - inTime).total_seconds())
                 addTimecardHour(inputHours)
                 nextDate = nextDate - timedelta(days=1)
-            elif i == daysDifference-1:
+            elif i == daysDifference:
+                print("fill")
+                session["curr_timecard_index"] = (nextDate - sunday).days
+                print(session["curr_timecard_index"])
+                setTimecardHour("24:00")
+                print("final")
                 session["curr_timecard_index"] = (now - sunday).days
                 inputHours = seconds_to_hours_string((now - nextDate).total_seconds())
                 addTimecardHour(inputHours)
             else:
+                print("fill")
                 session["curr_timecard_index"] = (nextDate - sunday).days
+                print(session["curr_timecard_index"])
                 setTimecardHour("24:00")
     else:
         session["curr_timecard_index"] = (inTime - sunday).days
@@ -771,7 +779,7 @@ def timecard():
     
     total = calculateTotalHours()
     
-    status = get_time(current_user.workId, datetime.strptime(startDate, '%m/%d/%Y|%H:%M')).state
+    status = get_time(current_user.workId, startDate.strftime('%m/%d/%Y')).state
     
     if form.validate_on_submit():
         if form.saveDraft.data:
@@ -855,7 +863,6 @@ def timecard_modal():
         return redirect(url_for('timecard'))
     form = Timecard_ModalForm()
     adaptNav()
-    status = get_time(current_user.workId, datetime.strptime(startDate, '%m/%d/%Y|%H:%M')).state
     weeks=getWeeks(current_user)
     if "bi" in current_user.payInt.lower():
         startDate = determineBiweeklyStart()
@@ -882,7 +889,7 @@ def timecard_modal():
         session.pop("curr_timecard_index")
         return redirect(url_for('timecard'))
         
-    return render_template('tc-modal.html', form=form, status=status, date=selectedDate, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
+    return render_template('tc-modal.html', form=form, date=selectedDate, weeks = weeks, today=datetime.now().day, dayVals = dayVals, curr_timecard_hours=curr_timecard_hours)
     
 class MaskVerifyForm(FlaskForm):
     submit = SubmitField("Submit Mask Verification")
