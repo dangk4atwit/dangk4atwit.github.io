@@ -382,30 +382,24 @@ def clock_out(sunday):
         update_clock(newC)
         return
     
-    nextDate = inTime
+    nextDate = inTime - timedelta(hours=inTime.hour, minutes=inTime.minute)
     daysDifference = (now - inTime).days
     if daysDifference > 0:
         for i in range(daysDifference+1):
             nextDate = nextDate + timedelta(days=1)
             if i == 0:
-                print("start")
                 session["curr_timecard_index"] = (inTime - sunday).days
                 inputHours = seconds_to_hours_string((nextDate - inTime).total_seconds())
                 addTimecardHour(inputHours)
-                nextDate = nextDate - timedelta(days=1)
             elif i == daysDifference:
-                print("fill")
-                session["curr_timecard_index"] = (nextDate - sunday).days
-                print(session["curr_timecard_index"])
-                setTimecardHour("24:00")
-                print("final")
+                if (not i - 1 == 0):
+                    session["curr_timecard_index"] = (nextDate - sunday).days
+                    setTimecardHour("24:00")
                 session["curr_timecard_index"] = (now - sunday).days
                 inputHours = seconds_to_hours_string((now - nextDate).total_seconds())
                 addTimecardHour(inputHours)
             else:
-                print("fill")
                 session["curr_timecard_index"] = (nextDate - sunday).days
-                print(session["curr_timecard_index"])
                 setTimecardHour("24:00")
     else:
         session["curr_timecard_index"] = (inTime - sunday).days
@@ -769,13 +763,8 @@ def timecard():
         startDate = getLastSunday()
         form = TimecardForm(amount=getWeeks(current_user)*7, sunday=getLastSunday())
     
+    getTimecardHours(current_user.workId, startDate, form.dayVals)
     curr_timecard_hours = session.get("curr_timecard_hours", None)
-    if curr_timecard_hours == None:
-        getTimecardHours(current_user.workId, startDate, form.dayVals)
-        curr_timecard_hours = session.get("curr_timecard_hours", None)
-    if curr_timecard_hours == []:
-        getTimecardHours(current_user.workId, startDate, form.dayVals)
-        curr_timecard_hours = session.get("curr_timecard_hours", None)
     
     total = calculateTotalHours()
     
