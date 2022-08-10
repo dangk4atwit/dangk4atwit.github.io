@@ -28,6 +28,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 results = {}
 
+    #getting/reading the labels 
 def gen_labels():
         labels = {}
         with open("app/labels.txt", "r") as label:
@@ -75,6 +76,7 @@ def maskverify(_id):
     # A dict that stores the labels
     labels = gen_labels()
     try:
+        #turning on ther camera
         camera = cv2.VideoCapture(0)
         while True:
             success, frame=camera.read()
@@ -105,6 +107,7 @@ def maskverify(_id):
                 normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
                 # Load the image into the array
                 data[0] = normalized_image_array
+                #getting the prediction of the image and outputting the results
                 pred = model.predict(data, verbose = 0)
                 result = np.argmax(pred[0])
                 
@@ -920,7 +923,7 @@ def symptom_check():
     
     if form.validate_on_submit():
         if form.noSymp.data:
-            submitSymptom(current_user.workId, False)
+            submitSymptom(current_user.workId, False)   
         sympArr = request.form.getlist('symptom')
         if len(sympArr) > 0:
             submitSymptom(current_user.workId, True)
@@ -1045,7 +1048,7 @@ def org_management():
 
 
 
-
+#logging out and redirecting to login page
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -1054,6 +1057,7 @@ def logout():
     return redirect(url_for('login'))
 
 
+#redirecting to dashboard
 @app.route('/')
 @login_required
 def home():
