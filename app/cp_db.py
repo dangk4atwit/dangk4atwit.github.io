@@ -6,7 +6,10 @@ from sqlalchemy import null
 app = Flask(__name__)
 db = SQLAlchemy(app)
 
+#creating the databse for SQL to work
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+#setting the binds to allow for use of multiple databases
 app.config['SQLALCHEMY_BINDS'] = {
     'organization': 'sqlite:///organizations.db',
     'timecard': 'sqlite:///timecards.db',
@@ -17,8 +20,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 
+#databse used to store information of the users such as the admin/supervisor/employees
 class User(db.Model, UserMixin):
-    
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(80), nullable=False)
     lname = db.Column(db.String(80), nullable=False)
@@ -52,9 +55,11 @@ class User(db.Model, UserMixin):
         self.super_id = super_id
         self.orga_id = orga_id
         
-db.create_all()
-db.session.commit()
+db.create_all() #create the database with the following columns
+db.session.commit() #commiting the information into the table
         
+        
+#databse used to store information of the organizations
 class Org(db.Model, UserMixin):
     __bind_key__ = 'organization'
     id = db.Column(db.Integer, primary_key=True)
@@ -93,6 +98,7 @@ class Org(db.Model, UserMixin):
 db.create_all(bind=['organization'])
 db.session.commit()
         
+#databse used to store information of the user's timecard (hours, days, weeks)
 class Time(db.Model, UserMixin):
     __bind_key__ = 'timecard'
     id = db.Column(db.Integer, primary_key=True)
@@ -127,6 +133,7 @@ class Time(db.Model, UserMixin):
 db.create_all(bind=['timecard'])
 db.session.commit()
 
+#databse used to store information of the users clock in/out
 class Clock(db.Model, UserMixin):
     __bind_key__ = 'clock'
     id = db.Column(db.Integer, primary_key=True)
@@ -144,6 +151,7 @@ class Clock(db.Model, UserMixin):
 db.create_all(bind=['clock'])
 db.session.commit()
 
+#databse used to store information of the users verifcatins - mask will not store users images/face
 class Verify(db.Model, UserMixin):
     __bind_key__ = 'verify'
     id = db.Column(db.Integer, primary_key=True)
@@ -164,6 +172,9 @@ class Verify(db.Model, UserMixin):
 
 db.create_all(bind=['verify'])
 db.session.commit()
+
+
+#these are all of our global variables used to access the database
 
 def get_verify(_id):
     verify=Verify.query.filter_by(user_id=_id).first()
