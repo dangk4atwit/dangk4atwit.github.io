@@ -28,7 +28,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 results = {}
 
-    #getting/reading the labels 
+#getting/reading the labels 
 def gen_labels():
         labels = {}
         with open("app/labels.txt", "r") as label:
@@ -113,6 +113,7 @@ def maskverify(_id):
                 
                 results[_id] = result
                 
+                #outputting the image
                 ret, frame=cv2.imencode('.jpg',frame)
                 frame=frame.tobytes()
                 yield(b'--frame\r\n'

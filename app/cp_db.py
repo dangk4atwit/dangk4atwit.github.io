@@ -20,14 +20,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 
-#databse used to store information of the users such as the admin/supervisor/employees
+# Databse used to store information of the users such as the admin/supervisor/employees
 class User(db.Model, UserMixin):
+    #Each of these variables will either contain and interger or string
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(80), nullable=False)
     lname = db.Column(db.String(80), nullable=False)
+    #Some variables are set as unique to prevent any duplicates
     email = db.Column(db.String(80), nullable=False, unique=True)
-    username = db.Column(db.String(20), nullable=False, unique=True) # 20 characters
-    password = db.Column(db.String(80), nullable=False)  # 80 characters
+    username = db.Column(db.String(20), nullable=False, unique=True) 
+    password = db.Column(db.String(80), nullable=False)  
     workId = db.Column(db.Integer, nullable=False)
     pronouns = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(80), nullable=False)
@@ -38,6 +40,7 @@ class User(db.Model, UserMixin):
     super_id = db.Column(db.Integer, nullable=False)
     orga_id = db.Column(db.Integer, nullable=False)
     
+    #Initializing these variables to be used
     def __init__(self, fname, lname, email, username, password, workId, pronouns, phone,
     etype, pay, payInt, super_id, orga_id, pImgURL="None"):
         self.fname = fname
@@ -78,7 +81,7 @@ class Org(db.Model, UserMixin):
     checkSymptom = db.Column(db.Boolean, nullable=False)
     info={'bind_key':'organization'}
     
-
+    #Initializing these variables to be used
     def __init__(self, orgUname, orgPass, orgName, phoneorg, des, ceo, orgAddress, logoURL, bannerURL, orgid, checkTimecard, checkMask, checkSymptom):
         self.orgUname = orgUname
         self.orgPass = orgPass
@@ -115,6 +118,7 @@ class Time(db.Model, UserMixin):
     state = db.Column(db.String(20), nullable=False)
     info={'bind_key':'timecard'}
     
+    #Initializing these variables to be used
     def __init__(self, user_id, start_week, sunday, monday, tuesday, wednesday, thursday, friday,
     saturday, total, state):
         self.user_id = user_id
@@ -142,6 +146,7 @@ class Clock(db.Model, UserMixin):
     clocked_out = db.Column(db.Boolean, nullable=False)
     info={'bind_key':'clock'}
     
+    #Initializing these variables to be used
     def __init__(self, user_id, clock_in, clocked_out):
         self.user_id = user_id
         self.clock_in = clock_in
@@ -162,6 +167,7 @@ class Verify(db.Model, UserMixin):
     symptomTime = db.Column(db.String(20), nullable=False)
     info={'bind_key':'verify'}
     
+    #Initializing these variables to be used
     def __init__(self, user_id, maskVerify, maskTime, symptomVerify, symptomTime):
         self.user_id = user_id
         self.maskVerify = maskVerify
@@ -176,10 +182,12 @@ db.session.commit()
 
 #these are all of our global variables used to access the database
 
+#Get user id for verification
 def get_verify(_id):
     verify=Verify.query.filter_by(user_id=_id).first()
     return verify
 
+#Updating the verification status
 def update_verify(new_verify):
     old_verify = get_verify(new_verify.user_id)
     if old_verify != None:
@@ -188,10 +196,12 @@ def update_verify(new_verify):
     db.session.add(new_verify)
     db.session.commit()
     
+#Grabbing the organization by id
 def get_org(_id):
     org = Org.query.filter_by(orgid=_id).first()
     return org
 
+#Updating the organization
 def update_org(new_org):
     old_org = get_org(new_org.orgid)
     if old_org != None:
@@ -200,10 +210,12 @@ def update_org(new_org):
     db.session.add(new_org)
     db.session.commit()
 
+#Getting the start of the week
 def get_time(_id, start_week):
     time = Time.query.filter_by(user_id=_id, start_week=start_week).first()
     return time
 
+#Updating the time/date
 def update_time(new_time):
     old_time = get_time(new_time.user_id, new_time.start_week)
     if old_time != None:
@@ -212,14 +224,17 @@ def update_time(new_time):
     db.session.add(new_time)
     db.session.commit()
 
+#Getting the user work id
 def get_user(_id):
     user = User.query.filter_by(workId=_id).first()
     return user
 
+#Grabbing the time for when user is clocked in
 def get_clock_in(_id):
     clock = Clock.query.filter_by(user_id=_id).first()
     return clock
 
+#Updating the time from clocking out
 def update_clock(new_clock):
     old_c = get_clock_in(new_clock.user_id)
     if old_c != None:
@@ -228,10 +243,12 @@ def update_clock(new_clock):
     db.session.add(new_clock)
     db.session.commit()
 
+#Getting the list of employees
 def get_employees(_id):
     users = User.query.filter_by(super_id=_id).all()
     return users
 
+#Getting user's submitted time card
 def get_employee_submitted_timecards(_id):
     users = get_employees(_id)
     times = []
