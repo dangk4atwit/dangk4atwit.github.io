@@ -65,7 +65,7 @@ def maskverify(_id):
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
     # Loading the model
-    model = tensorflow.keras.models.load_model('app/keras_model.h5', compile=False)
+    model = tensorflow.keras.models.load_model('app/static/models/keras_model.h5', compile=False)
     global results
     result = 0
     """
@@ -77,7 +77,7 @@ def maskverify(_id):
     labels = gen_labels()
     try:
         #turning on ther camera
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             success, frame=camera.read()
             if not success:
@@ -104,9 +104,9 @@ def maskverify(_id):
                 #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
                 frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
 
-                normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+                # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
                 # Load the image into the array
-                data[0] = normalized_image_array
+                # data[0] = normalized_image_array
                 #getting the prediction of the image and outputting the results
                 pred = model.predict(data, verbose = 0)
                 result = np.argmax(pred[0])
