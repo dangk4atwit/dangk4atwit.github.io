@@ -83,17 +83,9 @@ def maskverify(_id):
             if not success:
                 break
             else:
-    
-                # Draw a rectangle, in the frame
-                if result == 1.0:
-                    color = (0,255,0)
-                else:
-                    color = (0,0,255)
-            
-                # Draw rectangle in which the image to labelled is to be shown.
-                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
-                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
                 
+                #frame2 = frame[160:480, 80:370]
+
                 # resize the image to a 224x224
                 # resizing the image to be at least 224x224 and then cropping from the center
                 frame2 = cv2.resize(frame, (224, 224))
@@ -106,9 +98,19 @@ def maskverify(_id):
                 #getting the prediction of the image and outputting the results
                 pred = model.predict(normalized_image_array, verbose = 0)
                 
-                result = np.round(pred)
-                results[_id] = np.round(pred.item())
+                result = np.round(pred.item())
+                results[_id] = result
                 
+                # Draw a rectangle, in the frame
+                if result == 1.0:
+                    color = (0,255,0)
+                else:
+                    color = (0,0,255)
+            
+                # Draw rectangle in which the image to labelled is to be shown.
+                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
+                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
+
                 #outputting the image
                 ret, frame=cv2.imencode('.jpg',frame)
                 frame=frame.tobytes()
