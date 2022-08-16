@@ -77,7 +77,7 @@ def maskverify(_id):
     labels = gen_labels()
     try:
         #turning on ther camera
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         while True:
             success, frame=camera.read()
             if not success:
