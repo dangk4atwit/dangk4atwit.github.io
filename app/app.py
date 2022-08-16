@@ -65,7 +65,7 @@ def maskverify(_id):
     # Disable scientific notation for clarity
     np.set_printoptions(suppress=True)
     # Loading the model
-    model = tensorflow.keras.models.load_model('app/static/models/keras_model.h5', compile=False)
+    model = tensorflow.keras.models.load_model('app/static/models/mymodel.h5', compile=False)
     global results
     result = 0
     """
@@ -77,7 +77,7 @@ def maskverify(_id):
     labels = gen_labels()
     try:
         #turning on ther camera
-        camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        camera = cv2.VideoCapture(0)
         while True:
             success, frame=camera.read()
             if not success:
@@ -85,33 +85,29 @@ def maskverify(_id):
             else:
     
                 # Draw a rectangle, in the frame
-                if result == 1:
+                if result == 1.0:
                     color = (0,255,0)
                 else:
                     color = (0,0,255)
-                
+            
                 # Draw rectangle in which the image to labelled is to be shown.
-                frame2 = frame[160:480, 80:370]
+                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
+                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
                 
-                                
                 # resize the image to a 224x224
                 # resizing the image to be at least 224x224 and then cropping from the center
-                frame2 = cv2.resize(frame2, (224, 224))
+                frame2 = cv2.resize(frame, (224, 224))
                 # turn the image into a numpy array
                 image_array = np.asarray(frame2)
                 # Normalize the image
-                
-                #frame = cv2.rectangle(frame, (60, 40), (580, 450), color, 3)
-                frame = draw_border(frame, (160, 80), (480, 370), color, 3, 15, 50)
 
-                normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-                # Load the image into the array
-                data[0] = normalized_image_array
+                normalized_image_array = (image_array.astype(np.float32)/ 255.0)
+                normalized_image_array = np.reshape(normalized_image_array, (-1, 224, 224, 3))
                 #getting the prediction of the image and outputting the results
-                pred = model.predict(data, verbose = 0)
-                result = np.argmax(pred[0])
+                pred = model.predict(normalized_image_array, verbose = 0)
                 
-                results[_id] = result
+                result = np.round(pred)
+                results[_id] = np.round(pred.item())
                 
                 #outputting the image
                 ret, frame=cv2.imencode('.jpg',frame)
